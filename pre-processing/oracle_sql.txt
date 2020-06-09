@@ -1,0 +1,34 @@
+create user recommend IDENTIFIED by oracle account unlock;​
+
+alter user recommend default tablespace users;
+
+alter user recommend
+
+quota unlimited on users;
+
+grant connect, resource to recommend;
+
+grant create view to recommend;
+
+##########################################
+
+drop table recipe_infos;
+commit;
+create table recipe_infos (
+    id varchar2(255),
+    cat1 varchar2(255),
+    cat2 varchar2(255),
+    cat3 varchar2(255),
+    cat4 varchar2(255),
+    rec_title clob default empty_clob(),
+    rec_sub clob default empty_clob(),
+    rec_source clob default empty_clob(),
+    rec_step clob default empty_clob()
+);
+commit;
+
+#########################################
+create table recipe_table
+as
+select * from recipe_infos where regexp_like(id,'^[0-9]+$');
+commit;
