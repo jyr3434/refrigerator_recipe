@@ -24,7 +24,7 @@ class RecipePreProcess:
     def str_drop_na(self,df):
         print('drop before',df.shape)
         for x in df.columns:
-            df.loc[df[x] == '-'] = np.nan
+            df.loc[df[x] == '-'] = None
         df = df.dropna(axis=0) #(125964, 10)
 
         for x in range(0,9):
@@ -32,7 +32,7 @@ class RecipePreProcess:
         print('drop after',df.shape)
         return 0
 
-    def match_db_df(self,df):
+    def filter_rawData_by_db_id(self,df):
         conn,cur = None,None
         rg = re.compile('^[0-9]+$')
         try:
@@ -44,15 +44,19 @@ class RecipePreProcess:
             sql = " select id from recipe_infos "
             lists = []
             for i in cur.execute(sql):
-
-                if i[0] and rg.match(i[0]):
+                if i[0] and rg.match(i[0]) and rg.match(i[0]):
                     db_set.add(int(i[0]))
+                    lists.append(i[0])
 
-            print(lists)
+            print(len(db_set))
+            print(len(lists))
+            # print(len(lists),lists)
             df_set = set(df['id'])
 
-            intersection_id = df_set - db_set
-            return  df.loc[intersection_id,:]
+            intersection_id = list(set.intersection(db_set,df_set))
+            db_df = pd.DataFrame(intersection_id,columns=['id'])
+            df2 = self.merge_data(df,db_df,on='id')
+            print(df2.shape)
         except Exception as err:
             print(err)
         finally:
@@ -60,7 +64,7 @@ class RecipePreProcess:
                 cur.close()
             if conn:
                 conn.close()
-
+        return df2
     # 해당 데이터프레임을 oracle table에 insert한다.
     '''
     (1383, id                                                      6930519
@@ -123,17 +127,64 @@ class RecipePreProcess:
         # print(sql)
         return sql
 
+    def select_all_db(self):
+        conn = None
+        cur = None
+        try:
+            loginfo = 'recommend/oracle@localhost:1521/xe'
+            conn = cx_Oracle.connect(loginfo, encoding='utf-8')
+            cur = conn.cursor()
+            # recipe_table ( 최종 필터링된 테이블 ) 존재하는 상태에서 불러올수있다.
+            sql = ' select * from recipe_table '
+            db_df = pd.read_sql(sql=sql, con=conn)
+            print(db_df.shape)
+            db_df.to_csv('../../data/crawl_data/select_all_db.csv', index=False)
+        except Exception as err:
+            print(err)
+        finally:
+            if cur is not None:
+                cur.close()
+            if conn is not None:
+                conn.close()
 
+    def comprehession_data(self,db,raw):
+        db = db.sort_values(by='id')
+        print(db)
+        raw = raw.sort_values(by='id')
+        print(raw)
+        n = 0
+        for i in range(0,120749):
+
+            x = db.iloc[i,7][:10]
+            y = raw.iloc[i,7][:10]
+            if x == y:
+                n += 1
+        print('n : ',n)
 if __name__ == '__main__':
     recipepp = RecipePreProcess()
     #############
-    # df_to_oracle
-    df = pd.read_csv('../../data/crawl_data/recipe_data_dropna.csv')
-    print(df.shape)
-    print(recipepp.match_db_df(df).shape)
+    ########## df_to_oracle
+
+    ######### select from oracle
+    # df = pd.read_csv('../../data/crawl_data/recipe_data_dropna.csv')
+    # print(df.shape)
+    # dbdata = recipepp.filter_rawData_by_db_id(df)
+    # dbdata.to_csv('../../data/crawl_data/filter_rawData_by_db_id.csv',encoding='utf-8',index=False)
     # recipepp.df_to_oracle(df)
     ###################
 
+    ########### select_all_db() #######################
+    # raw_df = pd.read_csv('../../data/crawl_data/filter_rawData_by_db_id.csv')
+    # recipepp.select_all_db()
+    #######################################################
+
+    ############################# comprehession_data ##############
+    db = pd.read_csv('../../data/crawl_data/select_all_db.csv')
+    db.columns = [ i.lower() for i in db.columns]
+    print(db.columns)
+    raw = pd.read_csv('../../data/crawl_data/filter_rawData_by_db_id.csv')
+    recipepp.comprehession_data(db,raw)
+    #############################################################
 
     ################# multi process ######################
     # loginfo = 'recommend/oracle@localhost:1521/xe'
