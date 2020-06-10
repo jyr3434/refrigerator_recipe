@@ -19,9 +19,14 @@ recss = ['rec_source', 'rec_step']
 # 불용어 확보를 위한 테스트
 for item1 in data_source.iloc[:,0]:
     #print(item)
-
-    ang = re.findall('[0-9][^0-9]',item1)
-    print(ang)
+    catl = item1.split('&')
+    for cat in catl :
+        stopw = []
+        sourcel = cat.split('|')
+        for source in sourcel:
+            ang = re.findall('[0-9]+.+',source)
+            stopw.append(ang)
+        print(stopw)
 
 
 
