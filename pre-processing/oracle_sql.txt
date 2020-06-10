@@ -28,7 +28,3 @@ create table recipe_infos (
 commit;
 
 #########################################
-create table recipe_table
-as
-select * from recipe_infos where regexp_like(id,'^[0-9]+$');
-commit;

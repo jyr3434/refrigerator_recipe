@@ -10,7 +10,7 @@ okt = Okt()
 
 
 filename1 = '../../../data/crawl_data/recipe_data_dropna.csv'
-data1 = pd.read_csv(filename1, encoding='UTF-8', index_col=0).head(1)
+data1 = pd.read_csv(filename1, encoding='UTF-8', index_col=0).head(10)
 #mycol = ['recipe_id','cat1','cat2','cat3','cat4']
 data1 = pd.DataFrame(data1)
 data_source = data1.loc[:,['rec_source','rec_step']]
@@ -21,12 +21,12 @@ class konlpy:
     def __init__(self):
         pass
 
-    def RERE(self,data):
-        for item in data['rec_source']:
-            #ang = item
-            ang = re.split('[0-9][^0-9]',item)
-
-        return ang
+    # def RERE(self,data):
+    #     for item in data['rec_source']:
+    #         #ang = item
+    #         ang = re.split('[0-9][^0-9]',item)
+    #
+    #     return ang
 
 
     def df_token(self, recss):
@@ -90,9 +90,27 @@ if __name__ == '__main__':
     tot, n = kon.Check_token(l1,l2)
     #[print(l) for l in tot]
     #print(n)
+    newlist = []
+    allkey = []
+    i = 0
+    print(l1)
+    for idx10 in l1:
+        for idx9 in idx10:
+            newlist.append(idx9)
+
+    set_newlist = set(newlist)
+    print(set_newlist)
+    print('-' * 40)
+    count = 0
+    for item in set_newlist:
+        count = count + 1
+        print('count_({}) >>>>> {}'.format(count, item))
+
+
+
     data_s.to_csv('../../../data/process_data/test_token1.csv')
-    ang = kon.RERE(data_source)
-    print(ang)
+    #ang = kon.RERE(data_source)
+    #print(ang)
     # print(data_source)
     # print(kon)
     print("--- %s seconds ---" % (time.time() - start_time))
