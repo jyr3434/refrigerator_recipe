@@ -18,32 +18,45 @@ recss = ['rec_source', 'rec_step']
 start = time.time()
 # 불용어 확보를 위한 테스트
 set_source = set()
+
+######### make stopword dict ##################3
+stopword_dict = dict()
+with open('../../../data/nlp_data/source_stopword.txt','r',encoding='utf-8') as f:
+    for kwd in f.readlines():
+        key,values = kwd.split(':')
+        stopword_dict[key] = [i.strip('\n') for i in values.split(',')]
+print(stopword_dict)
+
+# dataframe only rec_source column
+
+norm_source_total = []
+
 for item1 in data_source.iloc[:,0]:
     #print(item)
+    # catl = 재료 카테고리 주재료,부재료...
     catl = item1.split('&')
+    norm_sourcel = set()
     for cat in catl :
-        sourcel = cat.split('|')
-        for source in sourcel:
-            source = re.sub("[0-9].*","",source)
-            source = source.split(' ')
-            for i in source:
-                if not re.match("^\(.*",i):
-                    if not re.match("[0-9].+",i):
-                        if not re.match("^[a-zA-Z]+$",i):
-                            i = re.sub('[=|;|:|)|(]+',repl='',string=i).strip('/+-.)*').split('이나')[0]\
-                            .split('or')[0].split('>')[-1]
-                            i = re.sub('흙애서','',i)
-                            i = re.sub('넣+','',i)
-                            set_source.add(i)
+        raw_sourcel = cat.split('|')
+        for source in raw_sourcel:
+            for key,vals in stopword_dict.items():
+                for v in vals:
+                    if re.match(f'{v}',source):
+                        norm_sourcel.add(key)
+    if len(list(norm_sourcel))>2:
+        norm_source_total.append(norm_sourcel)
+
+print(len(norm_source_total))
 
 print(len(set_source))
 print(sorted(list(set_source)))
 print(list(set_source).sort())
-pd.DataFrame(sorted(list(set_source))).to_csv('../../../data/nlp_data/split_space_source_keyword02.csv')
+# pd.DataFrame(sorted(list(set_source))).to_csv('../../../data/nlp_data/split_space_source_keyword02.csv')
 print(time.time() - start)
 
 
 #print(type(data_source))
 #print(data_source.iloc[:,0])
 
+############# multi process #############
 

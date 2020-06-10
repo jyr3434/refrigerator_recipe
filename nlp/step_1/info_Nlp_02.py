@@ -32,7 +32,7 @@ for item1 in data_source.iloc[:,0]:
 print(len(set_source))
 print(sorted(list(set_source)))
 print(list(set_source).sort())
-pd.DataFrame(sorted(list(set_source))).to_csv('../../../data/nlp_data/split_space_source_keyword.csv')
+# pd.DataFrame(sorted(list(set_source))).to_csv('../../../data/nlp_data/split_space_source_keyword.csv')
 
 
 #print(type(data_source))
