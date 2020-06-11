@@ -9,8 +9,6 @@ from multiprocessing import Pool
 
 
 
-
-
 class konlpy:
 
     def __init__(self):
