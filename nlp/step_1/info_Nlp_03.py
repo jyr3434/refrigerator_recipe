@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     source = Source()
 
-    pool = Pool(processes=16)
+    pool = Pool(processes=8)
     norm_source_total = pool.map(source.subset_kwd,data_source.iloc[:,0])
     # norm_source_total = [ i for i in norm_source_total if i is not None ]
     norm_str_list = []
@@ -119,5 +119,6 @@ if __name__ == '__main__':
     df.to_csv('../../../data/nlp_data/kwd_source.csv',encoding='utf-8')
     norm_source_total = [ i for i in norm_source_total if i is not None ]
     print(len(norm_source_total))
-    # 93725
+    # 110715
     print(time.time() - start)
+    # 65.7620894908905...s
