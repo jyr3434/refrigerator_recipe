@@ -84,8 +84,6 @@ class Source:
                             find = True
                             break
                         if find : break
-
-
         if len(list(norm_sourcel)) > 2:
             return norm_sourcel
         else: return None
