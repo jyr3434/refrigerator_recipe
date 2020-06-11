@@ -17,7 +17,14 @@ class Crawl:
         self.cat1,self.cat2,self.cat3,self.cat4 = {},{},{},{}
         
 
-    def GetCRL(self): # 대분류별 중분류 정보 수집
+    def Crawl_category_id(self): # 대분류별 중분류 정보 수집
+        '''
+        crawling category id(number) from recipe main page
+        and setting instances values -> cat1~4
+        why crawl category id??
+            we request url combine category id by get method
+        :return: None
+        '''
         req = urllib.request.Request(self.main_url)
         sourcecode = urllib.request.urlopen(req).read()
         soup = BeautifulSoup(sourcecode, "html.parser")
@@ -28,7 +35,6 @@ class Crawl:
         result = []
         for allca in caturl:
             catall = allca.find_all('a')
-
 
             cat_dict = {}
             for a in catall[1:]:
@@ -111,7 +117,7 @@ class Crawl:
         # end for
         return recipe_list # 1페이지당 레시피의 결과물
 
-    def PageCrawler(self,recipe_id):
+    def Crawl_recipe_detail(self,recipe_id):
         rec_dict = {}
         Curl = 'https://www.10000recipe.com/recipe/'+ str(recipe_id)
         try:
@@ -186,7 +192,7 @@ class Crawl:
 
 if __name__=='__main__':
     crawl = Crawl()
-    # crawl.GetCRL()
+    # crawl.Crawl_category_id()
     # print(crawl.cat4, crawl.cat2, crawl.cat3, crawl.cat1, sep='\n')
     print('크롤링 시작')
     start_time = time.time()
@@ -194,7 +200,7 @@ if __name__=='__main__':
     df = pd.read_csv('../pre-processing/crawl_data/id_4category.csv',index_col=0)
     print(df.iloc[:5,0])
     pool = Pool(processes=16) # 4개의 프로세스를 사용합니다
-    result = pool.map(crawl.PageCrawler, iter(df.iloc[70000:,0]))
+    result = pool.map(crawl.Crawl_recipe_detail, iter(df.iloc[70000:,0]))
     df = pd.DataFrame(result)
     '''
     # 중복되는 파일명으로 내용이 덮어쓰기가 될수 있으므로
