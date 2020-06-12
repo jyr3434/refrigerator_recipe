@@ -1,16 +1,8 @@
-from konlpy.tag import Okt,Mecab
-from konlpy.corpus import kobill
-import matplotlib.pyplot as plt
-from collections import Counter
-import pandas as pd
-import re,time
+from konlpy.tag import Okt
 from multiprocessing import Pool
 
-
-
-
-
-
+import pandas as pd
+import re,time
 
 class Step:
     def __init__(self):
@@ -27,7 +19,6 @@ class Step:
         self.okt = Okt()
 
     def rec_step_tokenize(self, iterrow):
-
         token_set = set()
         sentence_list = iterrow[1].rec_step.split('|')
         for sentence in sentence_list:
@@ -42,7 +33,6 @@ class Step:
             not_subset_token = []
             for x in list1[i]:
                 if x not in list2[i]:
-                    # print(x)
                     not_subset_token.append(x)
             if not_subset_token: n+=1
             tot.append(not_subset_token)
@@ -62,7 +52,7 @@ class Step:
                         break
                     if self.find: break
         return id,'|'.join(norm_stepl)
-        #########################################
+# class Step
 okt = None
 
 def multiprocessing_initializer():

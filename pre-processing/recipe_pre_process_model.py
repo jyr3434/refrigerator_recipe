@@ -4,6 +4,8 @@ import cx_Oracle
 import re
 from multiprocessing import Pool
 
+# 전처리의 데이터 결합은 크롤링
+# 결측치 처리는 전처리
 
 class RecipePreProcess:
     def __init__(self):
@@ -11,7 +13,7 @@ class RecipePreProcess:
     def concat_data(self,x,y):
         return pd.concat([x,y],axis=0,ignore_index=True)
     def merge_data(self,x,y,on):
-        return pd.merge(x,y,how='inner',left_on=on,right_on=on)
+        return pd.merge(x,y,how='inner',on=on)
 
     # 파일명과 데이터 프레임을 넣어 준다.
     def save_data(self,filename,df):
@@ -195,11 +197,11 @@ if __name__ == '__main__':
     # recipepp.conn.close()
     ##########################################
 
-    # df1 = pd.read_csv('crawl_data/recipe_info_0_60000.csv',index_col=0)
-    # df2 = pd.read_csv('crawl_data/recipe_info_60000_135345.csv',index_col=0)
+    # df1 = pd.read_csv('../../data/crawl_data/recipe_info_0_60000.csv',index_col=0)
+    # df2 = pd.read_csv('../../data/crawl_data/recipe_info_60000_135345.csv',index_col=0)
     #
     # df3 = recipepp.concat_data(df1,df2)
-    # cat4_df = pd.read_csv('crawl_data/id_4category.csv',index_col=0)
+    # cat4_df = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
     # print(df3.shape,len(df3))
     # recipepp.save_data('recipe_info',df3)
     #
