@@ -33,7 +33,7 @@ class Embedding:
         tsneFrame = pd.DataFrame(W_tsne, index=noun_vocab, columns=['x', 'y'])
         return tsneFrame
 
-    def show_tsne(self,tsneFrame):
+    def  show_tsne(self,tsneFrame):
         plt.rc('font', family='Malgun Gothic')
         plt.figure()
         plt.scatter(tsneFrame['x'], tsneFrame['y'])
