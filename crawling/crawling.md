@@ -1,7 +1,7 @@
 ﻿
 
 
-> # **crawling_model.py**
+> # **nlp_crawling_model.py**
  ## 사용된 메소드
 
     class_Crawl()
