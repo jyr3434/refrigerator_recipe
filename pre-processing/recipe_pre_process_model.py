@@ -4,9 +4,6 @@ import cx_Oracle
 import re
 from multiprocessing import Pool
 
-# 전처리의 데이터 결합은 크롤링
-# 결측치 처리는 전처리
-
 class RecipePreProcess:
     def __init__(self):
         pass
@@ -19,7 +16,7 @@ class RecipePreProcess:
     def save_data(self,filename,df):
         if isinstance(df,pd.DataFrame):
             # 파일명, 데이터의 범위를 표시해준다.
-            df.to_csv('crawl_data/{}_0_{}.csv'.format(filename,len(df)),encoding='utf-8')
+            df.to_csv('../../data/pre_process_data/{}.csv'.format(filename),encoding='utf-8',index=False)
         else:
             print('argument type not dataframe')
 
@@ -34,7 +31,7 @@ class RecipePreProcess:
         print('drop after',df.shape)
         return 0
 
-    def filter_rawData_by_db_id(self,df):
+    def filter_rawData_by_db_id(self,raw_df):
         conn,cur = None,None
         rg = re.compile('^[0-9]+$')
         try:
@@ -44,20 +41,22 @@ class RecipePreProcess:
 
             db_set = set()
             sql = " select id from recipe_infos "
-            lists = []
+            db_id_list = []
+            # db를 가져와
             for i in cur.execute(sql):
-                if i[0] and rg.match(i[0]) and rg.match(i[0]):
+                if i[0] and rg.match(i[0]):
                     db_set.add(int(i[0]))
-                    lists.append(i[0])
+                    db_id_list.append(i[0])
 
             print(len(db_set))
-            print(len(lists))
+            print(len(db_id_list))
             # print(len(lists),lists)
-            df_set = set(df['id'])
+            df_set = set(raw_df['id'])
 
+            # 교집합 아이디 구하기
             intersection_id = list(set.intersection(db_set,df_set))
             db_df = pd.DataFrame(intersection_id,columns=['id'])
-            df2 = self.merge_data(df,db_df,on='id')
+            df2 = self.merge_data(raw_df,db_df,on='id')
             print(df2.shape)
         except Exception as err:
             print(err)
@@ -164,16 +163,16 @@ class RecipePreProcess:
         print('n : ',n)
 if __name__ == '__main__':
     recipepp = RecipePreProcess()
-    #############
-    ########## df_to_oracle
 
-    ######### select from oracle
+
+
+    ######### select from oracle ##############
     # df = pd.read_csv('../../data/crawl_data/recipe_data_dropna.csv')
     # print(df.shape)
     # dbdata = recipepp.filter_rawData_by_db_id(df)
     # dbdata.to_csv('../../data/crawl_data/filter_rawData_by_db_id.csv',encoding='utf-8',index=False)
     # recipepp.df_to_oracle(df)
-    ###################
+    #####################################
 
     ########### select_all_db() #######################
     # raw_df = pd.read_csv('../../data/crawl_data/filter_rawData_by_db_id.csv')
@@ -181,11 +180,11 @@ if __name__ == '__main__':
     #######################################################
 
     ############################# comprehession_data ##############
-    db = pd.read_csv('../../data/crawl_data/select_all_db.csv')
-    db.columns = [ i.lower() for i in db.columns]
-    print(db.columns)
-    raw = pd.read_csv('../../data/crawl_data/filter_rawData_by_db_id.csv')
-    recipepp.comprehession_data(db,raw)
+    # db = pd.read_csv('../../data/pre_process_data/select_all_db.csv')
+    # db.columns = [ i.lower() for i in db.columns]
+    # print(db.columns)
+    # raw = pd.read_csv('../../data/pre_process_data/filter_rawData_by_db_id.csv')
+    # recipepp.comprehession_data(db,raw)
     #############################################################
 
     ################# multi process ######################
@@ -197,17 +196,22 @@ if __name__ == '__main__':
     # recipepp.conn.close()
     ##########################################
 
+    ####################### step1 ########################
+    category = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
+    detail = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
+    recipe = recipepp.merge_data(category,detail,'recipe_id')
+    print(recipe.shape,len(recipe))
+    recipepp.save_data('recipe_raw',recipe)
+    ########################################################
 
-    # category = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
-    # detail = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
-    # df4 = recipepp.merge_data(cat4_df,df3)
-    # print(df4.shape,len(df4))
-    # recipepp.save_data('recipe_data_final',df4)
+    ####################### step2 ###############################
 
-    # df = pd.read_csv('crawl_data/recipe_data_final_0_135326.csv',index_col=0)
+
+    ##############################step3 ##################################
+    # recipe = pd.read_csv('crawl_data/recipe_raw.csv',index_col=0)
     # print(df.columns)
     '''
-    Index(['id', 'cat1', 'cat2', 'cat3', 'cat4', 'recipe_id', 'rec_title',
+    Index(['recipe_id', 'cat1', 'cat2', 'cat3', 'cat4', 'rec_title',
        'rec_sub', 'rec_source', 'rec_step', 'rec_tag'],
       dtype='object')
     '''
