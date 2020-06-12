@@ -9,43 +9,44 @@ from multiprocessing import Pool
 
 class Crawl:
     # 초기 url 여기에 cat id를 합친다
-    main_url = 'https://www.10000recipe.com/recipe/list.html'
-    base_url = 'https://www.10000recipe.com/recipe/list.html?cat1={}&cat2={}&cat3={}'
-    cat4_url = 'https://www.10000recipe.com/recipe/list.html?cat4={}'
+    get_category_id_url = 'https://www.10000recipe.com/recipe/list.html'
+    get_recipe_id_base_url = 'https://www.10000recipe.com/recipe/list.html?cat1={}&cat2={}&cat3={}'
+    category4_url = 'https://www.10000recipe.com/recipe/list.html?cat4={}'
     def __init__(self):
-        # 대분류별(cat1~4) 중분류 정보를 담고 있는 변수 key : id_text / value : id
-        self.cat1,self.cat2,self.cat3,self.cat4 = {},{},{},{}
+        # 대분류별(category1~4) 중분류 정보를 담고 있는 변수 key : id_text / value : id
+        self.category1,self.category2,self.category3,self.category4 = {},{},{},{}
         
 
     def Crawl_category_id(self): # 대분류별 중분류 정보 수집
         '''
         crawling category id(number) from recipe main page
-        and setting instances values -> cat1~4
+        and setting instances values -> category1~4
         why crawl category id??
             we request url combine category id by get method
         :return: None
         '''
-        req = urllib.request.Request(self.main_url)
+        req = urllib.request.Request(self.get_category_id_url)
         sourcecode = urllib.request.urlopen(req).read()
         soup = BeautifulSoup(sourcecode, "html.parser")
 
-        pattern = re.compile('[0-9]+')
 
-        caturl = soup.find("div", id="id_search_category").find_all("div", class_="cate_list")
-        result = []
-        for allca in caturl:
-            catall = allca.find_all('a')
-
-            cat_dict = {}
-            for a in catall[1:]:
+        super_category_list = soup.find("div", id="id_search_category").find_all("div", class_="cate_list")
+        pattern = re.compile('[0-9]+') # subset only category id
+        super_category_result = []
+        # super 순서 ㅊ
+        for super_category in super_category_list:
+            sub_category_list = super_category.find_all('a')
+            sub_category_dict = {}
+            # sub_category_list[0]은 '전체' not use
+            for a in sub_category_list[1:]:
                 #print(a['href'])
                 re_str = a['href'].split(',')[1]
                 cat_id = pattern.search(re_str).group()
                 cat_text = a.text
-                cat_dict[cat_id] = cat_text
+                sub_category_dict[cat_id] = cat_text
 
-            result.append(cat_dict)
-        self.cat4, self.cat2, self.cat3, self.cat1 =  result
+            super_category_result.append(sub_category_dict)
+        self.category4, self.category2, self.category3, self.category1 =  super_category_result
 
     def Crawl_recipe_id(self,c1): # 중분류별 레시피 id 수집
         '''
@@ -56,12 +57,11 @@ class Crawl:
         :param c1: 방법 분류 id
         :return: recipe_list ( 1 recipe :: 1 dict ) recipe id 가 어떤 중분류(방법, 상황, 재료) 정보를 담고 있는지 같이 저장된다.
         '''
-
-        recipe_list = []
-        for c2 in self.cat2.keys():
-            for c3 in self.cat3.keys():
+        recipe_id_result = []
+        for c2 in self.category2.keys():
+            for c3 in self.category3.keys():
                 for page_idx in count(1):
-                    pageurl = self.base_url.format(c1,c2,c3) + '&page=' + str(page_idx) # 방법, 상황, 재료
+                    pageurl = self.get_recipe_id_base_url.format(c1,c2,c3) + '&page=' + str(page_idx) # 방법, 상황, 재료
                     print(pageurl)
                     sourcecode = urllib.request.urlopen(pageurl).read()
                     soup = BeautifulSoup(sourcecode, "html.parser")
@@ -76,16 +76,16 @@ class Crawl:
                             if a:
                                 recipe_id = a['href'].split('/')[2] # /recipe/id 중 id만 추출
                                 print(recipe_id)
-                                recipe_list.append({'id':recipe_id,\
-                                                    'cat1':self.cat1[c1],\
-                                                    'cat2':self.cat2[c2],\
-                                                    'cat3':self.cat3[c3]})
+                                recipe_id_result.append({'recipe_id':recipe_id,\
+                                                    'category1':self.category1[c1],\
+                                                    'category2':self.category2[c2],\
+                                                    'category3':self.category3[c3]})
                     else: # 검색결과가 없습니다 작업 중단
                         break
         # end for
-        return recipe_list # 1페이지당 레시피의 결과물
+        return recipe_id_result # 1페이지당 레시피의 결과물
 
-    def Crawl_recipe_id_by_cat4(self,c4):
+    def Crawl_recipe_id_by_category4(self,c4):
         '''
         category4를 이용하여 각 조건에 해당하는 레시피의 id를 추출한다.
 
@@ -95,7 +95,7 @@ class Crawl:
         recipe_list = []
 
         for page_idx in count(1):
-            pageurl = self.cat4_url.format(c4) + '&page=' + str(page_idx) # 종류
+            pageurl = self.category4_url.format(c4) + '&page=' + str(page_idx) # 종류
             print(pageurl)
             sourcecode = urllib.request.urlopen(pageurl).read()
             soup = BeautifulSoup(sourcecode, "html.parser")
@@ -109,8 +109,8 @@ class Crawl:
                     if a:
                         recipe_id = a['href'].split('/')[2]
                         print(recipe_id)
-                        recipe_list.append({'id':recipe_id,\
-                                            'cat4':self.cat4[c4]
+                        recipe_list.append({'recipe_id':recipe_id,\
+                                            'category4':self.category4[c4]
                                             })
             else: # 검색결과가 없습니다
                 break
@@ -119,34 +119,38 @@ class Crawl:
 
     def Crawl_recipe_detail(self,recipe_id):
         rec_dict = {}
-        Curl = 'https://www.10000recipe.com/recipe/'+ str(recipe_id)
+        url = 'https://www.10000recipe.com/recipe/'+ str(recipe_id)
         try:
-            csourcecode = urllib.request.urlopen(Curl).read()
-        except urllib.error.URLError:
+            sourcecode = urllib.request.urlopen(url).read()
+            soup = BeautifulSoup(sourcecode, "html.parser")
+        except urllib.error.URLError as err:
+            print(err)
             return rec_dict
-        soup = BeautifulSoup(csourcecode, "html.parser")
 
-        rec_title = []  # 레시피 제목
         rec_source = {}  # 레시피 재료
         rec_step = []  # 레시피 순서
+        ######## 레시피 id ############
         rec_dict['id'] = str(recipe_id)
+        ######### 레시피 제목 #############
         try:
-            res = soup.find('div', 'view2_summary')
-            res = soup.find('h3')
-            rec_dict['rec_title']=res.get_text()
+            h3 = soup.find('h3')
+            rec_title = h3.get_text()
+            rec_dict['rec_title']= rec_title
 
         except(AttributeError):
             rec_dict['rec_title']='-'
-
+        ######### 레시피 부연 설명 ###########
         try:
-            res = soup.find('div', 'view2_summary_info')
-            rec_dict['rec_sub']= res.get_text().replace('\n', '')
-            res = soup.find('div', 'ready_ingre3')
-        except(AttributeError):
+            view2_summary_info = soup.find('div', 'view2_summary_info')
+            rec_sub = view2_summary_info.get_text().replace('\n', '')
+            rec_dict['rec_sub']= rec_sub
+        except(AttributeError) as err:
+            print(err)
             rec_dict['rec_sub']='-'
-
-        rg = re.compile('[\s]{2,}')
+        ########## 레시피 재료 ###########
         try:
+            rg = re.compile('[\s]{2,}')
+            res = soup.find('div', 'ready_ingre3')
             source_category = []
             for n in res.find_all('ul'):
                 source_element_list = []
@@ -161,7 +165,7 @@ class Crawl:
         except (AttributeError):
             rec_dict['rec_source']='-'
 
-            #  요리 순서 찾는 for 문
+        ###########  레시피 조리 순서 ############
         res = soup.find('div', 'view_step')
         i = 0
         if (res):
@@ -184,44 +188,48 @@ class Crawl:
             rec_dict['rec_step'] = '-'
             rec_dict['rec_tag'] = '-'
         # 해시 태그가 글 내에 있는 판단하고 출력 해주는  for문
-
-
         print(rec_dict)
-
         return rec_dict
 
 if __name__=='__main__':
-    crawl = Crawl()
-    # crawl.Crawl_category_id()
-    # print(crawl.cat4, crawl.cat2, crawl.cat3, crawl.cat1, sep='\n')
     print('크롤링 시작')
     start_time = time.time()
+    #################### step1 ####################
+    crawl = Crawl()
+    # crawl.Crawl_category_id()
+    # print(crawl.category4, crawl.category2, crawl.category3, crawl.category1, sep='\n')
 
-    df = pd.read_csv('../pre-processing/crawl_data/id_4category.csv',index_col=0)
-    print(df.iloc[:5,0])
-    pool = Pool(processes=16) # 4개의 프로세스를 사용합니다
-    result = pool.map(crawl.Crawl_recipe_detail, iter(df.iloc[70000:,0]))
-    df = pd.DataFrame(result)
-    '''
-    # 중복되는 파일명으로 내용이 덮어쓰기가 될수 있으므로
-    # file_serial_name으로 구별 시킨다.
-    '''
-    file_serial_name = 'serial_n'
-    df.to_csv('../pre-processing/crawl_data/recipe_info_{}.csv'.format(file_serial_name))
-    # result_list = pool.map(crawl.Crawl_recipe_id,iter(crawl.cat1.keys()))
+    pool = Pool(processes=16)
+    ################### step2 #####################
+    # step2_result = pool.map(crawl.Crawl_recipe_id,iter(crawl.category1.keys()))
+    # df_data = []
+    # [df_data.extend(i) for i in step2_result]
+    # step2_df = pd.DataFrame(df_data)
+    # step2_df.to_csv('../../data/crawl_data/Crawl_recipe_id.csv', encoding='UTF-8', header=True)
+
+    ################### step3 #####################
+    # result_list = pool.map(crawl.Crawl_recipe_id_by_category4,iter(crawl.category4.keys()))
     # end = []
     # [end.extend(i) for i in result_list]
     # df = pd.DataFrame(end)
-    # df.to_csv('crawl_data/crawl_recipe_id.csv', encoding='UTF-8', header=True)
+    # df.to_csv('../../data/crawl_data/Crawl_recipe_id_by_category4.csv', encoding='UTF-8', header=True)
 
-    # result_list = pool.map(crawl.Crawl_recipe_id_by_cat4,iter(crawl.cat4.keys()))
-    # end = []
-    # [end.extend(i) for i in result_list]
-    # df = pd.DataFrame(end)
-    # df.to_csv('crawl_data/cat4.csv', encoding='UTF-8', header=True)
+    ################## step4 ##############################
+    # category_1_3 = pd.read_csv('../../data/crawl_data/Crawl_recipe_id.csv',index_col=0)
+    # category_4 = pd.read_csv('../../data/crawl_data/Crawl_recipe_id_by_category4.csv',index_col=0)
+    # category = pd.merge(category_1_3,category_4,on='recipe_id')
+    # category.to_csv('category.csv',encoding='utf-8', index=False)
 
-    # df1 = pd.read_csv('crawl_data/crawl_recipe_id.csv',index_col=0)
-    # df2 = pd.read_csv('crawl_data/cat4.csv',index_col=0)
-    # df3 = pd.merge(df1,df2,on='id')
-    # df3.to_csv('crawl_data/id_4category.csv',encoding='UTF-8',header=True)
+    ################ step5 ####################################
+    # category = pd.read_csv('../../data/crawl_data/category.csv')
+    # pool = Pool(processes=16) # 4개의 프로세스를 사용합니다
+    # detail_data = pool.map(crawl.Crawl_recipe_detail, iter(category.iloc[:,0]))
+    # detail = pd.DataFrame(detail_data)
+    # '''
+    # # 중복되는 파일명으로 내용이 덮어쓰기가 될수 있으므로
+    # # file_serial_name으로 구별 시킨다.
+    # '''
+    # file_serial_name = 'serial_n'
+    # detail.to_csv('../pre-processing/crawl_data/Crawl_recipe_detail_{}.csv'.format(file_serial_name))
+
     print("--- %s seconds ---" % (time.time() - start_time))
