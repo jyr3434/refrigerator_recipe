@@ -220,22 +220,16 @@ if __name__=='__main__':
     # category = pd.merge(category_1_3,category_4,on='recipe_id')
     # category.to_csv('category.csv',encoding='utf-8', index=False)
 
-    ################ step5
-    df = pd.read_csv('../../data/crawl_data/category.csv')
-    print(df.iloc[:5,0])
-    pool = Pool(processes=16) # 4개의 프로세스를 사용합니다
-    result = pool.map(crawl.Crawl_recipe_detail, iter(df.iloc[:,0]))
-    df = pd.DataFrame(result)
-    '''
-    # 중복되는 파일명으로 내용이 덮어쓰기가 될수 있으므로
-    # file_serial_name으로 구별 시킨다.
-    '''
-    file_serial_name = 'serial_n'
-    df.to_csv('../pre-processing/crawl_data/recipe_info_{}.csv'.format(file_serial_name))
+    ################ step5 ####################################
+    # category = pd.read_csv('../../data/crawl_data/category.csv')
+    # pool = Pool(processes=16) # 4개의 프로세스를 사용합니다
+    # detail_data = pool.map(crawl.Crawl_recipe_detail, iter(category.iloc[:,0]))
+    # detail = pd.DataFrame(detail_data)
+    # '''
+    # # 중복되는 파일명으로 내용이 덮어쓰기가 될수 있으므로
+    # # file_serial_name으로 구별 시킨다.
+    # '''
+    # file_serial_name = 'serial_n'
+    # detail.to_csv('../pre-processing/crawl_data/Crawl_recipe_detail_{}.csv'.format(file_serial_name))
 
-
-    # df1 = pd.read_csv('crawl_data/Crawl_recipe_id.csv',index_col=0)
-    # df2 = pd.read_csv('crawl_data/category4.csv',index_col=0)
-    # df3 = pd.merge(df1,df2,on='id')
-    # df3.to_csv('crawl_data/category.csv',encoding='UTF-8',header=True)
     print("--- %s seconds ---" % (time.time() - start_time))

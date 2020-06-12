@@ -197,14 +197,9 @@ if __name__ == '__main__':
     # recipepp.conn.close()
     ##########################################
 
-    # df1 = pd.read_csv('../../data/crawl_data/recipe_info_0_60000.csv',index_col=0)
-    # df2 = pd.read_csv('../../data/crawl_data/recipe_info_60000_135345.csv',index_col=0)
-    #
-    # df3 = recipepp.concat_data(df1,df2)
-    # cat4_df = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
-    # print(df3.shape,len(df3))
-    # recipepp.save_data('recipe_info',df3)
-    #
+
+    # category = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
+    # detail = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
     # df4 = recipepp.merge_data(cat4_df,df3)
     # print(df4.shape,len(df4))
     # recipepp.save_data('recipe_data_final',df4)
