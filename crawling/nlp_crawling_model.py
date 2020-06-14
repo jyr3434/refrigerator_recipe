@@ -202,7 +202,7 @@ if __name__=='__main__':
 
     pool = Pool(processes=16)
     ################### step2 #####################
-    # step2_result = pool.map(crawl.Crawl_recipe_id,iter(crawl.category1.keys()))
+    step2_result = pool.map(crawl.Crawl_recipe_id,iter(crawl.category1.keys()))
     # df_data = []
     # [df_data.extend(i) for i in step2_result]
     # step2_df = pd.DataFrame(df_data)
