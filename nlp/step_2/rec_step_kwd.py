@@ -74,7 +74,7 @@ def rec_step_tokenize(iterrow):
 if __name__ == '__main__':
     start_time = time.time()
 
-    filename1 = '../../../data/crawl_data/recipe_data_dropna.csv'
+    filename1 = '../../../data/crawl_data/recipe_dropna.csv'
     data1 = pd.read_csv(filename1, encoding='UTF-8')
     data_source = data1.loc[:, ('id','rec_step')]
     # print(data_source)

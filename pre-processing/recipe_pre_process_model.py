@@ -20,55 +20,20 @@ class RecipePreProcess:
         else:
             print('argument type not dataframe')
 
-    def str_drop_na(self,df):
-        print('drop before',df.shape)
-        for x in df.columns:
-            df.loc[df[x] == '-'] = None
-        df = df.dropna(axis=0) #(125964, 10)
+    def str_drop_na(self,recipe_raw):
+        print('drop before',recipe_raw.shape)
+        for x in recipe_raw.columns[1:]:
+            recipe_raw.loc[recipe_raw[x] == '-',x] = np.nan
+        print(recipe_raw)
+        drop_na = recipe_raw.dropna(axis=0) #(125964, 10)
+        for x in range(1,9):
+            print(f'column {x} :',sum(drop_na.iloc[:,x] == '-'))
+        print('drop after',drop_na.shape)
+        return drop_na
 
-        for x in range(0,9):
-            print(sum(df.iloc[:,x] == '-'))
-        print('drop after',df.shape)
-        return 0
-
-    def filter_rawData_by_db_id(self,raw_df):
-        conn,cur = None,None
-        rg = re.compile('^[0-9]+$')
-        try:
-            loginfo = 'recommend/oracle@localhost:1521/xe'
-            conn = cx_Oracle.connect(loginfo, encoding='utf-8')
-            cur = conn.cursor()
-
-            db_set = set()
-            sql = " select id from recipe_infos "
-            db_id_list = []
-            # db를 가져와
-            for i in cur.execute(sql):
-                if i[0] and rg.match(i[0]):
-                    db_set.add(int(i[0]))
-                    db_id_list.append(i[0])
-
-            print(len(db_set))
-            print(len(db_id_list))
-            # print(len(lists),lists)
-            df_set = set(raw_df['id'])
-
-            # 교집합 아이디 구하기
-            intersection_id = list(set.intersection(db_set,df_set))
-            db_df = pd.DataFrame(intersection_id,columns=['id'])
-            df2 = self.merge_data(raw_df,db_df,on='id')
-            print(df2.shape)
-        except Exception as err:
-            print(err)
-        finally:
-            if cur:
-                cur.close()
-            if conn:
-                conn.close()
-        return df2
     # 해당 데이터프레임을 oracle table에 insert한다.
     '''
-    (1383, id                                                      6930519
+    (recipe_id                                                      6930519
     cat1                                                         볶음
     cat2                                                         일상
     cat3                                                       돼지고기
@@ -113,7 +78,7 @@ class RecipePreProcess:
             if conn is not None:
                 conn.close()
 
-    def execute_to_clob(self,col,text):
+    def sql_to_clob(self,col,text):
         sql = f" {col} = "
         lens = len(text)
         text = text.replace("'",'"')
@@ -138,8 +103,9 @@ class RecipePreProcess:
             # recipe_table ( 최종 필터링된 테이블 ) 존재하는 상태에서 불러올수있다.
             sql = ' select * from recipe_table '
             db_df = pd.read_sql(sql=sql, con=conn)
+            db_df.columns = [column.lower() for column in db_df]
             print(db_df.shape)
-            db_df.to_csv('../../data/crawl_data/select_all_db.csv', index=False)
+            db_df.to_csv('../../data/pre_process_data/recipe_nlp.csv', index=False)
         except Exception as err:
             print(err)
         finally:
@@ -148,44 +114,9 @@ class RecipePreProcess:
             if conn is not None:
                 conn.close()
 
-    def comprehession_data(self,db,raw):
-        db = db.sort_values(by='id')
-        print(db)
-        raw = raw.sort_values(by='id')
-        print(raw)
-        n = 0
-        for i in range(0,120749):
 
-            x = db.iloc[i,7][:10]
-            y = raw.iloc[i,7][:10]
-            if x == y:
-                n += 1
-        print('n : ',n)
 if __name__ == '__main__':
     recipepp = RecipePreProcess()
-
-
-
-    ######### select from oracle ##############
-    # df = pd.read_csv('../../data/crawl_data/recipe_data_dropna.csv')
-    # print(df.shape)
-    # dbdata = recipepp.filter_rawData_by_db_id(df)
-    # dbdata.to_csv('../../data/crawl_data/filter_rawData_by_db_id.csv',encoding='utf-8',index=False)
-    # recipepp.df_to_oracle(df)
-    #####################################
-
-    ########### select_all_db() #######################
-    # raw_df = pd.read_csv('../../data/crawl_data/filter_rawData_by_db_id.csv')
-    # recipepp.select_all_db()
-    #######################################################
-
-    ############################# comprehession_data ##############
-    # db = pd.read_csv('../../data/pre_process_data/select_all_db.csv')
-    # db.columns = [ i.lower() for i in db.columns]
-    # print(db.columns)
-    # raw = pd.read_csv('../../data/pre_process_data/filter_rawData_by_db_id.csv')
-    # recipepp.comprehession_data(db,raw)
-    #############################################################
 
     ################# multi process ######################
     # loginfo = 'recommend/oracle@localhost:1521/xe'
@@ -197,42 +128,34 @@ if __name__ == '__main__':
     ##########################################
 
     ####################### step1 ########################
-    category = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
-    detail = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
-    recipe = recipepp.merge_data(category,detail,'recipe_id')
-    print(recipe.shape,len(recipe))
-    recipepp.save_data('recipe_raw',recipe)
+    # category = pd.read_csv('../../data/crawl_data/category.csv',index_col=0)
+    # detail = pd.read_csv('../../data/crawl_data/Crawl_recipe_detail_0_135345.csv',index_col=0)
+    # recipe = recipepp.merge_data(category,detail,'recipe_id')
+    # print(recipe.shape,len(recipe))
+    # recipepp.save_data('recipe_raw',recipe)
     ########################################################
 
-    ####################### step2 ###############################
+    ######################## step2 ###########################
+    # recipe = pd.read_csv('../../data/pre_process_data/recipe_raw.csv')
+    # print(recipe.shape, len(recipe))
+    # print(recipe)
+    # drop_na = recipepp.str_drop_na(recipe.iloc[:,:9])
+    # drop_na.to_csv('../../data/pre_process_data/recipe_dropna.csv',index=False)
+
+    ###################### step [ 3 or 4 ] ###################
+
+    ######################## step5 #####################
+
+    ###################### step6 ###########################
+    recipepp.select_all_db()
 
 
-    ##############################step3 ##################################
-    # recipe = pd.read_csv('crawl_data/recipe_raw.csv',index_col=0)
-    # print(df.columns)
+
     '''
     Index(['recipe_id', 'cat1', 'cat2', 'cat3', 'cat4', 'rec_title',
        'rec_sub', 'rec_source', 'rec_step', 'rec_tag'],
       dtype='object')
     '''
-    # for x in range(0,11):
-    #     print(sum(df.iloc[:,x] == '-'))
-    '''
-    315
-    307
-    9747
-    11057
-    135318
-    8
-    '''
-    # print(sum(df['rec_tag'] != '-'))
-    # print(df.loc[df['rec_tag'] != '-','rec_tag'])
-    # # 결측치 제거
-
-    # df_dropna = df.drop(columns=['recipe_id','rec_tag'])
-    #################################################################
-
-    # df.to_csv('../../data/crawl_data/recipe_data_dropna.csv',encoding='utf-8',index=False)
     '''
     D:\Phycharm_pss\global_interpreter\venv\lib\site-packages\pandas\core\ops\array_ops.py:253:
     FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison

@@ -15,7 +15,7 @@ grant create view to recommend;
 drop table recipe_infos;
 commit;
 create table recipe_infos (
-    id varchar2(255),
+    recipe_id varchar2(255),
     cat1 varchar2(255),
     cat2 varchar2(255),
     cat3 varchar2(255),
@@ -27,4 +27,8 @@ create table recipe_infos (
 );
 commit;
 
+create table recipe_table
+as
+select * from recipe_infos where regexp_like(id,'^[0-9]+$');
+commit;
 #########################################
