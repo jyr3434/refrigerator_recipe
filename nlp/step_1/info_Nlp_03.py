@@ -9,7 +9,7 @@ okt = Okt()
 #mec = Mecab()
 
 
-# filename1 = '../../../data/crawl_data/recipe_data_dropna.csv'
+# filename1 = '../../../data/crawl_data/recipe_dropna.csv'
 # data1 = pd.read_csv(filename1, encoding='UTF-8', index_col=0)
 # #mycol = ['recipe_id','cat1','cat2','cat3','cat4']
 # data1 = pd.DataFrame(data1)
@@ -93,7 +93,7 @@ class Source:
 from multiprocessing import Pool
 if __name__ == '__main__':
 
-    filename1 = '../../../data/crawl_data/recipe_data_dropna.csv'
+    filename1 = '../../../data/crawl_data/recipe_dropna.csv'
     data1 = pd.read_csv(filename1, encoding='UTF-8', index_col=0)
     # mycol = ['recipe_id','cat1','cat2','cat3','cat4']
     data1 = pd.DataFrame(data1)
