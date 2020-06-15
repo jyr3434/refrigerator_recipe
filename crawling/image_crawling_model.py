@@ -53,14 +53,15 @@ class ImgSch:
         url = f'https://www.google.com/search?q={quote_plus(search)}&source=lnms&tbm=isch&sa=X&ved=' \
               f'2ahUKEwjtkrie6fvpAhWCMN4KHXxsArQQ_AUoAXoECBYQAw&biw=1920&bih=920'
 
-        path = 'C:\chromedriver.exe'
+        path = 'D:\chromedriver.exe'
         driver = webdriver.Chrome(path)
         driver.get(url)
-        for i in range(100):
+        for i in range(300):
             driver.execute_script("window.scrollBy(0,10000)")
+            driver.implicitly_wait(6)
 
         html = driver.page_source
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html,"html.parser")
         img = soup.select('.rg_i.Q4LuWd')
         n = 1
         imgurl = []
@@ -77,7 +78,7 @@ class ImgSch:
             urlretrieve(i, "../../data/crl_image/{}/" .format(search) + search + str(n) +  ".jpg")
             n += 1
             #print(imgurl)
-            if (n > 100):
+            if (n > 500):
                 break
 
         driver.close()
@@ -94,7 +95,7 @@ if __name__=='__main__':
     # 각식재료별 이미지 별도 폴더 생성
     ImgSch().Mk_folder()
 
-    pool = Pool(processes=16)
+    pool = Pool(processes=8)
     #pool.map(ImgSch().img_crl, wdlist[0:])
     pool.map(ImgSch().img_crl, wdlist[0:], time.sleep(5))
 
