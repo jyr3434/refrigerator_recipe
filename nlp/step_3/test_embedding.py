@@ -1,8 +1,14 @@
 from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
 from gensim.models import word2vec,Word2Vec
+
+
+import numpy as np
 import pandas as pd
 import math
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 class Embedding:
     def __init__(self,path):
@@ -21,22 +27,34 @@ class Embedding:
     def save_model(self,model,path):
         model.save(path)
 
-    def tsne_w2v(self,model,n_components):
-        tsne = TSNE(n_components=n_components)  # 2차원 설정
+    def pca_w2v(self,model,n_components):
+
+        pca = PCA(n_components=n_components)
 
         # noun_vocab : 학습된 명사 모록
         noun_vocab = [w for w in model.wv.vocab]
         W_data = model.wv[noun_vocab]
+        # pca
+        W_pca = pca.fit_transform(W_data)
+
+        col = ['d' + str(i) for i in range(1, n_components + 1)]
+        tsneFrame = pd.DataFrame(W_pca, index=noun_vocab, columns=col)
+        return tsneFrame
+
+    def tsne_w2v(self,W_data,noun_vocab,n_components):
+        tsne = TSNE(n_components=n_components)  # 2차원 설정
         # tsne
         W_tsne = tsne.fit_transform(W_data)
 
-        tsneFrame = pd.DataFrame(W_tsne, index=noun_vocab, columns=['x', 'y'])
+        col = ['d'+str(i) for i in range(1,n_components+1)]
+        tsneFrame = pd.DataFrame(W_tsne, index=noun_vocab, columns=col)
         return tsneFrame
 
+    #only 2d
     def  show_tsne(self,tsneFrame):
         plt.rc('font', family='Malgun Gothic')
         plt.figure()
-        plt.scatter(tsneFrame['x'], tsneFrame['y'])
+        plt.scatter(tsneFrame['d1'], tsneFrame['d2'])
 
         plt.title(f'재료의 명사 관계도')
         for word, pos in tsneFrame.iterrows():
@@ -59,13 +77,20 @@ if __name__ == '__main__':
     tsneFrame = embedding.tsne_w2v(model,n_components=2)
     embedding.show_tsne(tsneFrame)
     '''
+    # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
+    # tsneFrame = embedding.tsne_w2v(model, n_components=4)
+    # print(tsneFrame)
 
-
-
+    # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
+    # pcaFrame = embedding.pca_w2v(model, n_components=50)
+    # print(pcaFrame)
 
     # ##### make recipe tsne
     # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
-    # tsneFrame = embedding.tsne_w2v(model, n_components=2)
+
+    ####### noun_vocab : 학습된 명사 모록
+    # noun_vocab = [w for w in model.wv.vocab]
+    # tsneFrame = embedding.tsne_w2v(pcaFrame, noun_vocab,n_components=3)
     # real_source = list(tsneFrame.index)
     #
     # sourceframe = pd.read_csv('../../../data/nlp_data/kwd_source.csv')
@@ -76,68 +101,67 @@ if __name__ == '__main__':
     # for idx,row in sourceframe.iterrows():
     #     x = 0
     #     y = 0
+    #     z = 0
+    #
     #     title = row.rec_title
     #     source_list = [ i for i in row.kwd_source.split('|') if i in real_source ]
     #     if len(source_list):
     #         n = len(source_list)
     #         for source in source_list:
-    #             x += tsneFrame.loc[source,'x'] + 1000
-    #             y += tsneFrame.loc[source,'y'] + 1000
+    #             x += tsneFrame.loc[source,'d1'] + 1000
+    #             y += tsneFrame.loc[source,'d2'] + 1000
+    #             z += tsneFrame.loc[source,'d3'] + 1000
+    #
     #         mean_x = x/n
     #         mean_y = y/n
-    #         recipe_data.append({'title':title,'x':mean_x,'y':mean_y})
+    #         mean_z = z/n
     #
+    #         recipe_data.append({'title':title,'x':mean_x,'y':mean_y,'z':mean_z})
+    # # #
     # recipeFrame = pd.DataFrame(recipe_data)
+    # print(recipeFrame)
     # recipeFrame.to_csv('../../../data/nlp_data/recipe_embedding.csv')
 
-
-    recipeFrame = pd.read_csv('../../../data/nlp_data/recipe_embedding.csv',index_col=0)
-    recipeFrame.set_index(keys='title',inplace=True)
-    print(recipeFrame)
-    embedding.show_tsne(recipeFrame.iloc[:1000])
-    # e = 59618
-    # point_t = recipeFrame.iloc[e,0]
-    # point_x = recipeFrame.iloc[e,1]
-    # point_y = recipeFrame.iloc[e,2]
+    ###########
+    import random
+    ran = np.random.randint(1,10000,100)
+    print(ran)
+    recipeFrame = pd.read_csv('../../../data/nlp_data/recipe_embedding.csv',index_col=0).iloc[ran,:]
+    # recipeFrame.set_index(keys='title',inplace=True)
+    # print(recipeFrame)
+    # # embedding.show_tsne(recipeFrame.iloc[:1000])
+    # e = 2
+    # point_x = recipeFrame.iloc[e,0]
+    # point_y = recipeFrame.iloc[e,1]
+    # point_z = recipeFrame.iloc[e,2]
     #
     # distance_dict = dict()
     # for idx,row in recipeFrame.iterrows():
     #       x = (row.x-point_x)**2
     #       y = (row.y-point_y)**2
-    #       distance = math.sqrt(x+y)
-    #       distance_dict[row.title] = distance
+    #       z = (row.z-point_z)**2
+    #       distance = math.sqrt(x+y+z)
+    #       distance_dict[idx] = distance
     #
-    # sort_list = sorted(distance_dict.items(),key=lambda x : x[1])[:10]
+    # sort_list = sorted(distance_dict.items(),key=lambda x : x[1])[:30]
     # for i in sort_list:
     #     print(i)
-    #
-    # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
-    # tsneFrame = embedding.tsne_w2v(model, n_components=2)
-    # real_source = list(tsneFrame.index)
+
+    mpl.rcParams['legend.fontsize'] = 10  # 그냥 오른쪽 위에 뜨는 글자크기 설정이다.
+    mpl.rc('font', family='Malgun Gothic')
+    fig = plt.figure()  # 이건 꼭 입력해야한다.
+    ax = fig.gca(projection='3d')
+    theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)  # 각도의 범위는 -4파이 에서 +4파이
+    z = recipeFrame['z']  # z는 -2부터 2까지 올라간다.
+    r = z ** 2 + 1  # z값이 변함에 따라 반지름이 바뀔 것이다.
+    x = recipeFrame['x']  # 나선구조를 만들기 위해 x는 sin함수
+    y = recipeFrame['y']  # 나선구조를 만들기 위해 y는 cos함수
+    ax.plot(x, y, z,'o', label='parametric curve')  # 위에서 정의한 x,y,z 가지고 그래프그린거다.
+    ax.legend()  # 오른쪽 위에 나오는 글자 코드다. 이거 없애면 글자 사라진다. 없애도 좋다.
+    for t,x,y,z in zip(recipeFrame['title'],x,y,z):
+        ax.text(x,y,z,t)
+    plt.show()
 
 
 
-    # ##### make recipe tsne
-    # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
-    # tsneFrame = embedding.tsne_w2v(model, n_components=2)
-    # real_source = list(tsneFrame.index)
-    #
-    # sourceframe = pd.read_csv('../../../data/nlp_data/kwd_source.csv')
-    # cond = pd.notna(sourceframe['kwd_source'])
-    # sourceframe = sourceframe.loc[cond,:]
-    # recipe_data = list()
-    # #### 중심좌표 구하기
-    # for idx,row in sourceframe.iterrows():
-    #     x = 0
-    #     y = 0
-    #     title = row.rec_title
-    #     source_list = [ i for i in row.kwd_source.split('|') if i in real_source ]
-    #
-    #     for source in source_list:
-    #         x += tsneFrame.loc[source,'x']
-    #         y += tsneFrame.loc[source,'y']
-    #
-    #     recipe_data.append({'title':title,'x':x,'y':y})
-    #
-    # recipeFrame = pd.DataFrame(recipe_data)
-    # recipeFrame.to_csv('../../../data/nlp_data/recipe_embedding_sum_vector.csv')
+
