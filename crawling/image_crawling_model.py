@@ -6,6 +6,7 @@ from selenium import webdriver
 import pandas as pd
 from gensim.models import Word2Vec
 import re,time,urllib,os
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 
@@ -53,14 +54,16 @@ class ImgSch:
         url = f'https://www.google.com/search?q={quote_plus(search)}&source=lnms&tbm=isch&sa=X&ved=' \
               f'2ahUKEwjtkrie6fvpAhWCMN4KHXxsArQQ_AUoAXoECBYQAw&biw=1920&bih=920'
 
-        path = 'C:\chromedriver.exe'
+        path = 'd:\chromedriver.exe'
         driver = webdriver.Chrome(path)
         driver.get(url)
+        driver.implicitly_wait(5)
         for i in range(100):
             driver.execute_script("window.scrollBy(0,10000)")
+            driver.implicitly_wait(5)
 
         html = driver.page_source
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html,"html.parser")
         img = soup.select('.rg_i.Q4LuWd')
         n = 1
         imgurl = []
@@ -94,7 +97,7 @@ if __name__=='__main__':
     # 각식재료별 이미지 별도 폴더 생성
     ImgSch().Mk_folder()
 
-    pool = Pool(processes=16)
+    pool = Pool(processes=8)
     #pool.map(ImgSch().img_crl, wdlist[0:])
     pool.map(ImgSch().img_crl, wdlist[0:], time.sleep(5))
 
