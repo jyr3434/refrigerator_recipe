@@ -6,6 +6,7 @@ from selenium import webdriver
 import pandas as pd
 from gensim.models import Word2Vec
 import re,time,urllib,os
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 
@@ -53,12 +54,14 @@ class ImgSch:
         url = f'https://www.google.com/search?q={quote_plus(search)}&source=lnms&tbm=isch&sa=X&ved=' \
               f'2ahUKEwjtkrie6fvpAhWCMN4KHXxsArQQ_AUoAXoECBYQAw&biw=1920&bih=920'
 
+
         path = 'D:\chromedriver.exe'
         driver = webdriver.Chrome(path)
         driver.get(url)
         for i in range(300):
             driver.execute_script("window.scrollBy(0,10000)")
             driver.implicitly_wait(6)
+
 
         html = driver.page_source
         soup = BeautifulSoup(html,"html.parser")
