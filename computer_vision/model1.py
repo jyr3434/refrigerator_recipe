@@ -68,11 +68,11 @@ if __name__ == '__main__':
         train_img = pool.map(data.get_img,train)
         # test_img = pool.map(data.get_img,test)
 
-    train_x = []
-    [train_x.extend(i[0]) for i in train_img] #input
-    train_x = np.array(train_x)
-    print(train_x.nbytes)
-    np.save('../../data/computer_vision_data/train_x.npy',train_x)
+    # train_x = []
+    # [train_x.extend(i[0]) for i in train_img] #input
+    # train_x = np.array(train_x)
+    # print(train_x.nbytes)
+    # np.save('../../data/computer_vision_data/train_x.npy',train_x)
 
     # train_y = [i[1] for i in train_img] #output
     # with open('../../data/computer_vision_data/train_y.txt','w',encoding='utf-8') as f:
