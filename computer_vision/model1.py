@@ -4,6 +4,7 @@ import random
 import numpy as np
 from PIL import Image
 from multiprocessing import Pool
+from tensorflow.python.keras.preprocessing.image import load_img,img_to_array,array_to_img
 
 from tensorflow.python.keras.datasets import mnist
 from tensorflow.python.keras import losses
@@ -18,7 +19,7 @@ class Data:
         pass
 
     def get_path(self):
-        img_list = [ (i[0],i[2]) for i in list(os.walk('C:\\Users\\TJ\\Desktop\\dyffo\\Python\\project_03\\data\\crl_image\\crl_image_resize'))[1:]]
+        img_list = [ (i[0],i[2]) for i in list(os.walk('../../data/crl_image/crl_image_resize'))[1:]]
         # for i in img_list:
         #     print(i[0],i[1],sep='\n')
         return img_list # [ ( str, list ) , ... ]
@@ -47,8 +48,8 @@ class Data:
             print(label)
             for file in file_list:
                 filepath = '\\'.join((path,file))
-                img_file = Image.open(filepath)
-                img_array = np.array(img_file)
+                img_file = load_img(filepath)
+                img_array = img_to_array(img_file)
                 data_x.append(img_array)
                 data_y.append(label)
 
@@ -61,22 +62,31 @@ if __name__ == '__main__':
     data = Data()
 
     img_path = data.get_path()
+    print(img_path)
+
+    labeling_dict = { j[1]:j[0] for j in enumerate([i[0].split('\\')[-1] for i in img_path]) }
 
     train,test = data.seperate_data(img_path)
 
     with Pool(processes=8) as pool:
         train_img = pool.map(data.get_img,train)
-        # test_img = pool.map(data.get_img,test)
 
-    # train_x = []
-    # [train_x.extend(i[0]) for i in train_img] #input
-    # train_x = np.array(train_x)
-    # print(train_x.nbytes)
-    # np.save('../../data/computer_vision_data/train_x.npy',train_x)
 
-    # train_y = [i[1] for i in train_img] #output
-    # with open('../../data/computer_vision_data/train_y.txt','w',encoding='utf-8') as f:
-    #     f.write(','.join(train_y))
+    train_x = []
+    [train_x.extend(i[0]) for i in train_img] #input
+    print(len(train_x))
+    train_x = np.array(train_x)
+
+    print(train_x.nbytes)
+    np.save('../../data/computer_vision_data/train_x.npy',train_x)
+
+
+    train_y = []
+    [train_y.extend(i[1]) for i in train_img]
+    train_y = np.array([labeling_dict[i] for i in train_y]) #output
+    np.save('../../data/computer_vision_data/train_y.npy',train_y)
+
+
     # test_x = [i[0] for i in test_img] #input
     # np.save('../../data/computer_vision_data/test_ary.npy', test_x)
     # test_y = [i[1] for i in test_img] #output
