@@ -5,7 +5,7 @@ import tensorflow as tf
 # json_string = resnet.to_json()
 
 
-# with open('../../data/computer_vision/model.json','w') as f :
+# with open('../../data/computer_vision_data/model.json','w') as f :
 #     f.write(json_string)
 
 import json
@@ -13,7 +13,7 @@ import json
 # print(json.dumps(parse, indent=4, sort_keys=True))
 
 # pp_json_string = json.dumps(parse, indent=4, sort_keys=True)
-# with open('../../data/computer_vision/model.json','w') as f :
+# with open('../../data/computer_vision_data/model.json','w') as f :
 #     f.write(pp_json_string)
 
 print(tf.keras.__version__)
