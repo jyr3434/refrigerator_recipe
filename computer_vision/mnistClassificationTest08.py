@@ -17,7 +17,7 @@ from tensorflow.python.keras.layers import Conv2D,MaxPooling2D,Flatten,Dropout
 # reshape 2dim -> 1dim
 # convolution
 # 4dim으로 바꾸기 개수, 높이, 너비, 채널
-
+print(x_train.shape,type(x_train),x_train)
 # 이미지 크기 바꾸고
 x_train = x_train.reshape((60000, 28,28,1)) #(60000, 784)
 x_test = x_test.reshape((10000, 28,28,1))
