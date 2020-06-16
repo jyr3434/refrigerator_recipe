@@ -4,8 +4,12 @@ from tensorflow.python.keras import losses
 from tensorflow.python.keras.utils import np_utils
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense,Activation # 레이어 추가
-from keras import activations,optimizers,metrics
+from tensorflow.keras import activations,optimizers,metrics #케라스 자체로만 하면 최신 버전 사용 가능
 from tensorflow.python.keras.layers import Conv2D,MaxPooling2D,Flatten,Dropout
+
+# 케라스위주로 학습, 텐서플로우 노노
+# 파이토치
+
 
 # mnist 테이터셋
 (x_train, y_train) , (x_test, y_test) = mnist.load_data()
@@ -13,6 +17,8 @@ from tensorflow.python.keras.layers import Conv2D,MaxPooling2D,Flatten,Dropout
 # reshape 2dim -> 1dim
 # convolution
 # 4dim으로 바꾸기 개수, 높이, 너비, 채널
+
+# 이미지 크기 바꾸고
 x_train = x_train.reshape((60000, 28,28,1)) #(60000, 784)
 x_test = x_test.reshape((10000, 28,28,1))
 
@@ -24,6 +30,10 @@ y_train = np_utils.to_categorical(y_train)
 y_test = np_utils.to_categorical(y_test)
 
 # setting graph
+
+# TFrecord (체크)
+# 진행전 라벨링 작업, 전처리
+# 분류 갯수 설정
 nb_classes = 10
 model = Sequential()
 
