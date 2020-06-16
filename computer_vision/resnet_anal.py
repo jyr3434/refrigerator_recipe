@@ -17,3 +17,12 @@ import json
 #     f.write(pp_json_string)
 
 print(tf.keras.__version__)
+with tf.compat.v1.Session() as sess:
+  h = tf.constant("Hello")
+  w = tf.constant("World!")
+  hw = h + w
+  ans = sess.run(hw)
+  print(ans)
+
+# [출처] 파이썬 텐서플로 AttributeError: module 'tensorflow' has no attribute 'Session' 문제 해결 방법|작성자 까미유
+# 출처: https://mellowlee.tistory.com/entry/Windows-Tensorflow-Keras-사전-준비 [잠토의 잠망경]

@@ -7,7 +7,8 @@ from tensorflow.python.keras.preprocessing.image import load_img,img_to_array
 
 
 def get_path():
-    img_list = [(i[0], i[2]) for i in list(os.walk('../../data/crl_image/crl_image_resize'))[1:]]
+    img_list = [(i[0], i[2]) for i in list(os.walk('../../data/crawl_data/crl_image/crl_image_resize'))[1:]]
+    print(len(img_list))
     # for i in img_list:
     #     print(i[0],i[1],sep='\n')
     return img_list  # [ ( str, list ) , ... ]
@@ -59,7 +60,7 @@ def _validate_text(text):
         return str(text)
 
 
-def to_tfrecords(dirpath,labeling_dict,image_list, label, tfrecords_name):
+def to_tfrecords(dirpath,image_list, label, tfrecords_name):
     print("Start converting")
     options = tf.io.TFRecordOptions(compression_type = 'GZIP')
     writer = tf.io.TFRecordWriter(path=tfrecords_name, options=options)
@@ -87,7 +88,11 @@ def to_tfrecords(dirpath,labeling_dict,image_list, label, tfrecords_name):
 
 if __name__ == '__main__':
     image_path_list = get_path()
-    labeling_dict = label_dict(image_path_list)
-    for dirpath,filename_list in image_path_list:
+    # labeling_dict = label_dict(image_path_list)
+    train,test = seperate_data(image_path_list)
+    for dirpath,filename_list in train:
         label = dirpath.split('\\')[-1]
-        to_tfrecords(dirpath,labeling_dict,filename_list,label,'../../data/computer_vision_data/imgtfrecord.tfrecord')
+        to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/train.tfrecord')
+    for dirpath,filename_list in test:
+        label = dirpath.split('\\')[-1]
+        to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/test.tfrecord')

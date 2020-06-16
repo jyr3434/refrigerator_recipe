@@ -36,7 +36,7 @@ class ImgSch:
         return wdlist
 
     def Mk_folder(self):
-        base_dir = '../../data/crl_image/'
+        base_dir = '../../data/crawl_data/crl_image/'
         os.chdir(base_dir)
         for idx in wdlist:
             path = os.path.join(base_dir, str(idx))
