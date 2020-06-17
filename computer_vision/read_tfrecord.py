@@ -1,4 +1,5 @@
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 # Create a description of the features.
 def _parse_function(example_proto):
@@ -23,6 +24,15 @@ def _parse_function(example_proto):
 if __name__ == '__main__':
     raw_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/test.tfrecord',compression_type='GZIP')
     raw_dataset = raw_dataset.map(_parse_function)
+
     # print(raw_dataset)
-    for raw_record in raw_dataset.take(10):
-      print(raw_record['image'])
+    i = 0
+    for raw_record in raw_dataset.take(15000):
+        i+=1
+        print(i)
+        # plt.figure()
+        raw_record['image'] = tf.reshape(raw_record['image'],shape=(224,224,3))
+        img = tf.keras.preprocessing.image.array_to_img(raw_record['image'])
+        # plt.imshow(img)
+        # plt.show()
+        print(raw_record['image'])
