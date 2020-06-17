@@ -68,21 +68,23 @@ def to_tfrecords(dirpath,image_list, label, tfrecords_name):
 
     for image_path in image_list:
         filepath = '\\'.join((dirpath,image_path))
+
         image = load_img(filepath)
         image_ary = img_to_array(image)
-        print(image_ary)
-        # print(image_ary.shape)
+        # print(image_ary)
+        print(image_ary.shape)
         _binary_image = image_ary.tostring()
+
         # print(repr(_binary_image))
         # _binary_label = labeling_dict[label].tobytes()
         filename = os.path.basename(filepath)
 
         string_set = tf.train.Example(features=tf.train.Features(feature={
-            'x': _int64_feature(image_ary.shape[0]),
-            'y': _int64_feature(image_ary.shape[1]),
-            'z': _int64_feature(image_ary.shape[2]),
+            # 'x': _int64_feature(image_ary.shape[0]),
+            # 'y': _int64_feature(image_ary.shape[1]),
+            # 'z': _int64_feature(image_ary.shape[2]),
             'image': _bytes_feature(_binary_image),
-            'label': _bytes_feature(label.encode())
+            'label': _int64_feature(label)
             # 'mean': _float_feature(image.mean().astype(np.float32)),
             # 'std': _float_feature(image.std().astype(np.float32)),
             # 'filename': _bytes_feature(str.encode(filename)),
@@ -93,11 +95,12 @@ def to_tfrecords(dirpath,image_list, label, tfrecords_name):
 
 if __name__ == '__main__':
     image_path_list = get_path()
-    # labeling_dict = label_dict(image_path_list)
+    labeling_dict = label_dict(image_path_list)
     train,test = seperate_data(image_path_list)
     # for dirpath,filename_list in train:
     #     label = dirpath.split('\\')[-1]
     #     to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/train.tfrecord')
     for dirpath,filename_list in test[0:1]:
-        label = dirpath.split('\\')[-1]
+        labelkey = dirpath.split('\\')[-1]
+        label = labeling_dict[labelkey]
         to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/test.tfrecord')
