@@ -10,6 +10,7 @@ from tensorflow.python.keras.layers import Dense,Activation # 레이어 추가
 from tensorflow.keras import activations,optimizers,metrics #케라스 자체로만 하면 최신 버전 사용 가능
 from tensorflow.python.keras.layers import Conv2D,MaxPooling2D,Flatten,Dropout
 
+
 # Create a description of the features.
 def _parse_function(example_proto):
     # Parse the input `tf.Example` proto using the dictionary above.
@@ -36,69 +37,79 @@ def _parse_function(example_proto):
     return image,label
 
 if __name__ == '__main__':
-    train_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/train.tfrecord',compression_type='GZIP')
-    train_dataset = train_dataset.map(_parse_function)
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            tf.config.experimental.set_memory_growth(gpus[0], True)
+        except RuntimeError as e:
+            # 프로그램 시작시에 메모리 증가가 설정되어야만 합니다
+            print(e)
+    with tf.device('/GPU:0'):
 
-    # print(raw_dataset)
+        train_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/train.tfrecord',compression_type='GZIP')
+        train_dataset = train_dataset.map(_parse_function)
 
-    # for raw_record in raw_dataset.take(10):
-    #     # raw_record['image'] = tf.reshape(raw_record['image'] ,shape=(224,224,3))
-    #     print(raw_record[1])
+        # print(raw_dataset)
+
+        # for raw_record in raw_dataset.take(10):
+        #     # raw_record['image'] = tf.reshape(raw_record['image'] ,shape=(224,224,3))
+        #     print(raw_record[1])
 
 
 
-    # setting graph
+        # setting graph
 
-    # TFrecord (체크)
-    # 진행전 라벨링 작업, 전처리
-    # 분류 갯수 설정
-    nb_classes = 5
-    model = Sequential()
+        # TFrecord (체크)
+        # 진행전 라벨링 작업, 전처리
+        # 분류 갯수 설정
+        nb_classes = 5
+        model = Sequential()
 
-    # convolution layer
-    # padding = 'valid' (행열수 줄어듬), 'same' ( 행열수 보존 )
-    # filter 개수는 보통 32,64...
-    # Conv2D : input_shape -> ( 높이,너비,채널수 )
-    # 채널수는 흑백 : 1  컬럼 : 3(RGB)
-    # strides = (1,1) default
-    # convolution도 여러개로
-    model.add(Conv2D(filters=32, kernel_size=(3, 3), activation=activations.relu, input_shape=(224, 224, 3)))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+        # convolution layer
+        # padding = 'valid' (행열수 줄어듬), 'same' ( 행열수 보존 )
+        # filter 개수는 보통 32,64...
+        # Conv2D : input_shape -> ( 높이,너비,채널수 )
+        # 채널수는 흑백 : 1  컬럼 : 3(RGB)
+        # strides = (1,1) default
+        # convolution도 여러개로
+        model.add(Conv2D(filters=32, kernel_size=(3, 3), activation=activations.relu, input_shape=(224, 224, 3)))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(filters=64, kernel_size=(3, 3), activation=activations.relu))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Conv2D(filters=64, kernel_size=(3, 3), activation=activations.relu))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(filters=64, kernel_size=(3, 3), activation=activations.relu))
+        model.add(Conv2D(filters=64, kernel_size=(3, 3), activation=activations.relu))
 
-    # 4차원 데이터를 2차원으로 축소하기
-    model.add(Flatten())
+        # 4차원 데이터를 2차원으로 축소하기
+        model.add(Flatten())
 
-    # full connected
-    model.add(Dense(units=512, activation=activations.relu))
-    model.add(Dropout(0.3))
-    model.add(Dense(units=512, activation=activations.relu))
-    model.add(Dropout(0.3))
-    model.add(Dense(units=nb_classes, activation=activations.softmax))
+        # full connected
+        model.add(Dense(units=512, activation=activations.relu))
+        model.add(Dropout(0.3))
+        model.add(Dense(units=512, activation=activations.relu))
+        model.add(Dropout(0.3))
+        model.add(Dense(units=nb_classes, activation=activations.softmax))
 
-    model.summary()
+        model.summary()
+        # run_opts = tf.RunOptions(report_tensor_allocations_upon_oom=True)
+        # model = tf.keras.utils.multi_gpu_model(model, gpus=2)
+        model.compile(loss=losses.categorical_crossentropy, optimizer='rmsprop', metrics=['accuracy'])
 
-    model.compile(loss=losses.categorical_crossentropy, optimizer='rmsprop', metrics=['accuracy'])
+        print('fitting 중입니다.')  # checking workflow output
 
-    print('fitting 중입니다.')  # checking workflow output
-    with tf.device('/gpu:0'):
-        model.fit(train_dataset, epochs=5, batch_size=1, verbose=0)
+        model.fit(train_dataset, epochs=5, batch_size=20, verbose=0)
 
-    print(model.metrics_names)
+        print(model.metrics_names)
 
-    ###########################################
-    test_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/test.tfrecord',compression_type='GZIP')
-    test_dataset = test_dataset.map(_parse_function)
-    print('evaluate 중입니다.')  # checking workflow output
-    test_loss, test_acc = model.evaluate(test_dataset, verbose=0)
-    # model.metric_names와 model.evaluate의 return 결과물은 연관성이 있으니
-    # 둘의 관계를 공부하자
-    print('test_acc : %.4f' % test_acc)
-    print('test_loss : %.4f' % test_loss)
-    print('-' * 50)
-    model.save('raw_data_model.h5')
+        ###########################################
+        test_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/test.tfrecord',compression_type='GZIP')
+        test_dataset = test_dataset.map(_parse_function)
+        print('evaluate 중입니다.')  # checking workflow output
+        test_loss, test_acc = model.evaluate(test_dataset, verbose=0)
+        # model.metric_names와 model.evaluate의 return 결과물은 연관성이 있으니
+        # 둘의 관계를 공부하자
+        print('test_acc : %.4f' % test_acc)
+        print('test_loss : %.4f' % test_loss)
+        print('-' * 50)
+        model.save('../../data/computer_vision_data/raw_data_model.h5')
 
