@@ -7,7 +7,7 @@ from tensorflow.python.keras.preprocessing.image import load_img,img_to_array
 
 
 def get_path():
-    img_list = [(i[0], i[2]) for i in list(os.walk('../../data/crawl_data/crl_image/crl_image_resize'))[1:]]
+    img_list = [(i[0], i[2]) for i in list(os.walk('../../data/crl_image/crl_image_resize'))[1:]]
     print(len(img_list))
     # for i in img_list:
     #     print(i[0],i[1],sep='\n')
