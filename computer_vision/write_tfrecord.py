@@ -77,7 +77,7 @@ def to_tfrecords(dirpath,image_list, label, tfrecords_name):
 
         # print(repr(_binary_image))
         # _binary_label = labeling_dict[label].tobytes()
-        filename = os.path.basename(filepath)
+        # filename = os.path.basename(filepath)
 
         string_set = tf.train.Example(features=tf.train.Features(feature={
             # 'x': _int64_feature(image_ary.shape[0]),
@@ -96,11 +96,19 @@ def to_tfrecords(dirpath,image_list, label, tfrecords_name):
 if __name__ == '__main__':
     image_path_list = get_path()
     labeling_dict = label_dict(image_path_list)
+    with open('../../data/computer_vision_data/label_dict.txt','w',encoding='utf-8') as f:
+        for k,v in labeling_dict.items():
+            f.write(str(v)+':'+k+'\n')
     train,test = seperate_data(image_path_list)
-    # for dirpath,filename_list in train:
-    #     label = dirpath.split('\\')[-1]
-    #     to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/train.tfrecord')
-    for dirpath,filename_list in test[0:1]:
+    for dirpath,filename_list in train[0:5]:
+        # 라벨을 숫자로 치환
         labelkey = dirpath.split('\\')[-1]
         label = labeling_dict[labelkey]
+
+        to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/train.tfrecord')
+    for dirpath,filename_list in test[0:5]:
+        # 라벨을 숫자로 치환
+        labelkey = dirpath.split('\\')[-1]
+        label = labeling_dict[labelkey]
+
         to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/test.tfrecord')
