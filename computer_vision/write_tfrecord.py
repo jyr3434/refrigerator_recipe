@@ -7,7 +7,7 @@ from tensorflow.python.keras.preprocessing.image import load_img,img_to_array
 
 
 def get_path():
-    img_list = [(i[0], i[2]) for i in list(os.walk('../../data/crawl_data/crl_image/crl_image_resize'))[1:]]
+    img_list = [(i[0], i[2]) for i in list(os.walk('../../data/crl_image/crl_image_resize'))[1:]]
     print(len(img_list))
     # for i in img_list:
     #     print(i[0],i[1],sep='\n')
@@ -65,22 +65,27 @@ def to_tfrecords(dirpath,image_list, label, tfrecords_name):
     options = tf.io.TFRecordOptions(compression_type = 'GZIP')
     writer = tf.io.TFRecordWriter(path=tfrecords_name, options=options)
 
+
     for image_path in image_list:
         filepath = '\\'.join((dirpath,image_path))
-        image = Image.open(filepath)
+        image = load_img(filepath)
         image_ary = img_to_array(image)
-        _binary_image = image.tobytes()
+        print(image_ary)
+        # print(image_ary.shape)
+        _binary_image = image_ary.tostring()
+        # print(repr(_binary_image))
         # _binary_label = labeling_dict[label].tobytes()
         filename = os.path.basename(filepath)
 
         string_set = tf.train.Example(features=tf.train.Features(feature={
-            'height': _int64_feature(image_ary.shape[0]),
-            'width': _int64_feature(image_ary.shape[1]),
-            'Image': _bytes_feature(_binary_image),
-            'Label': _bytes_feature(label.encode()),
+            'x': _int64_feature(image_ary.shape[0]),
+            'y': _int64_feature(image_ary.shape[1]),
+            'z': _int64_feature(image_ary.shape[2]),
+            'image': _bytes_feature(_binary_image),
+            'label': _bytes_feature(label.encode())
             # 'mean': _float_feature(image.mean().astype(np.float32)),
             # 'std': _float_feature(image.std().astype(np.float32)),
-            'filename': _bytes_feature(str.encode(filename)),
+            # 'filename': _bytes_feature(str.encode(filename)),
         }))
 
         writer.write(string_set.SerializeToString())
@@ -90,9 +95,9 @@ if __name__ == '__main__':
     image_path_list = get_path()
     # labeling_dict = label_dict(image_path_list)
     train,test = seperate_data(image_path_list)
-    for dirpath,filename_list in train:
-        label = dirpath.split('\\')[-1]
-        to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/train.tfrecord')
-    for dirpath,filename_list in test:
+    # for dirpath,filename_list in train:
+    #     label = dirpath.split('\\')[-1]
+    #     to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/train.tfrecord')
+    for dirpath,filename_list in test[0:1]:
         label = dirpath.split('\\')[-1]
         to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/test.tfrecord')
