@@ -103,5 +103,5 @@ if __name__ == '__main__':
             f.write(str(v)+':'+k+'\n')
     train,test = seperate_data(image_path_list)
 
-    to_tfrecords(train,labeling_dict,'../../data/computer_vision_data/train.tfrecord')
-    to_tfrecords(test,labeling_dict,'../../data/computer_vision_data/test.tfrecord')
+    to_tfrecords(train[0:5],labeling_dict,'../../data/computer_vision_data/train.tfrecord')
+    to_tfrecords(test[0:5],labeling_dict,'../../data/computer_vision_data/test.tfrecord')
