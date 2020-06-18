@@ -6,8 +6,8 @@ import tensorflow as tf
 from tensorflow.python.keras.preprocessing.image import load_img,img_to_array
 
 
-def get_path():
-    img_list = [(i[0], i[2]) for i in list(os.walk('../../data/crl_image/crl_image_resize'))[1:]]
+def get_path(folder):
+    img_list = [(i[0], i[2]) for i in list(os.walk(f'../../data/crl_image/{folder}'))[1:]]
     print(len(img_list))
     # for i in img_list:
     #     print(i[0],i[1],sep='\n')
@@ -60,55 +60,50 @@ def _validate_text(text):
         return str(text)
 
 
-def to_tfrecords(dirpath,image_list, label, tfrecords_name):
+def to_tfrecords(data,labeling_dict, tfrecords_name):
     print("Start converting")
     options = tf.io.TFRecordOptions(compression_type = 'GZIP')
     writer = tf.io.TFRecordWriter(path=tfrecords_name, options=options)
 
+    for dirpath,image_list in data:
+        labelkey = dirpath.split('\\')[-1]
+        label = labeling_dict[labelkey]
+        for image_path in image_list:
+            filepath = '\\'.join((dirpath,image_path))
 
-    for image_path in image_list:
-        filepath = '\\'.join((dirpath,image_path))
+            image = load_img(filepath)
+            image_ary = img_to_array(image)
+            # print(image_ary)
+            print(image_ary.shape)
+            _binary_image = image_ary.tostring()
 
-        image = load_img(filepath)
-        image_ary = img_to_array(image)
-        # print(image_ary)
-        print(image_ary.shape)
-        _binary_image = image_ary.tostring()
+            # print(repr(_binary_image))
+            # _binary_label = labeling_dict[label].tobytes()
+            # filename = os.path.basename(filepath)
 
-        # print(repr(_binary_image))
-        # _binary_label = labeling_dict[label].tobytes()
-        # filename = os.path.basename(filepath)
+            string_set = tf.train.Example(features=tf.train.Features(feature={
+                # 'x': _int64_feature(image_ary.shape[0]),
+                # 'y': _int64_feature(image_ary.shape[1]),
+                # 'z': _int64_feature(image_ary.shape[2]),
+                'image': _bytes_feature(_binary_image),
+                'label': _int64_feature(label)
+                # 'mean': _float_feature(image.mean().astype(np.float32)),
+                # 'std': _float_feature(image.std().astype(np.float32)),
+                # 'filename': _bytes_feature(str.encode(filename))
+            }))
 
-        string_set = tf.train.Example(features=tf.train.Features(feature={
-            # 'x': _int64_feature(image_ary.shape[0]),
-            # 'y': _int64_feature(image_ary.shape[1]),
-            # 'z': _int64_feature(image_ary.shape[2]),
-            'image': _bytes_feature(_binary_image),
-            'label': _int64_feature(label)
-            # 'mean': _float_feature(image.mean().astype(np.float32)),
-            # 'std': _float_feature(image.std().astype(np.float32)),
-            # 'filename': _bytes_feature(str.encode(filename))
-        }))
-
-        writer.write(string_set.SerializeToString())
+            writer.write(string_set.SerializeToString())
     writer.close()
 
 if __name__ == '__main__':
-    image_path_list = get_path()
+    image_path_list = get_path('crl_image_resize_del')
     labeling_dict = label_dict(image_path_list)
     with open('../../data/computer_vision_data/label_dict.txt','w',encoding='utf-8') as f:
         for k,v in labeling_dict.items():
             f.write(str(v)+':'+k+'\n')
     train,test = seperate_data(image_path_list)
-    for dirpath,filename_list in train[0:10]:
-        # 라벨을 숫자로 치환
-        labelkey = dirpath.split('\\')[-1]
-        label = labeling_dict[labelkey]
 
-        to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/train.tfrecord')
-    for dirpath,filename_list in test[0:10]:
-        # 라벨을 숫자로 치환
-        labelkey = dirpath.split('\\')[-1]
-        label = labeling_dict[labelkey]
-
-        to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/test.tfrecord')
+    train_name = 'train_del'
+    test_name = 'test_del'
+    to_tfrecords(train[0:10], labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
+    to_tfrecords(test[0:10], labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')

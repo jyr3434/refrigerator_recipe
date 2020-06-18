@@ -29,8 +29,8 @@ def _parse_function(example_proto):
     image = tf.cast(parsed_features['image'], tf.float32) / 255.0
     image = tf.reshape(image, [1,224, 224, 3])
 
-    label = tf.one_hot(parsed_features['label'],5)
-    label = tf.reshape(label, [1,5])
+    label = tf.one_hot(parsed_features['label'],10)
+    label = tf.reshape(label, [1,10])
     # parsed_features['image'] = tf.reshape(parsed_features['image'],shape=(224,224,3))
     # return {'image':parsed_features['image'],'label':parsed_features["label"],'x':parsed_features['x'],
     #         'y':parsed_features['y'],'z':parsed_features['z']}
@@ -46,7 +46,7 @@ if __name__ == '__main__':
             print(e)
     with tf.device('/GPU:0'):
 
-        train_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/train.tfrecord',compression_type='GZIP')
+        train_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/train_del.tfrecord',compression_type='GZIP')
         train_dataset = train_dataset.map(_parse_function)
 
         # print(raw_dataset)
@@ -62,7 +62,7 @@ if __name__ == '__main__':
         # TFrecord (체크)
         # 진행전 라벨링 작업, 전처리
         # 분류 갯수 설정
-        nb_classes = 5
+        nb_classes = 10
         model = Sequential()
 
         # convolution layer
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         print(model.metrics_names)
 
         ###########################################
-        test_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/test.tfrecord',compression_type='GZIP')
+        test_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/test_del.tfrecord',compression_type='GZIP')
         test_dataset = test_dataset.map(_parse_function)
         print('evaluate 중입니다.')  # checking workflow output
         test_loss, test_acc = model.evaluate(test_dataset, verbose=1)
