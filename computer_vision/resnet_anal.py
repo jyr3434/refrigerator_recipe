@@ -33,7 +33,7 @@ import json
 # Create a description of the features.
 
 from tensorflow.python.client import device_lib
-import keras
-# print(device_lib.list_local_devices())
-# config = tf.config.
+
+print(device_lib.list_local_devices())
+
 
