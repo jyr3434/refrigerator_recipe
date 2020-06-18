@@ -270,4 +270,4 @@ if __name__ == '__main__':
         print('test_acc : %.4f' % test_acc)
         print('test_loss : %.4f' % test_loss)
         print('-' * 50)
-        resnet50.save('../../data/computer_vision_data/raw_data_model.h5')
+        resnet50.save('../../data/computer_vision_data/resnet_data_model.h5')
