@@ -103,8 +103,9 @@ if __name__ == '__main__':
             f.write(str(v)+':'+k+'\n')
     train,test = seperate_data(image_path_list)
 
-    train_name = 'train_del'
-    test_name = 'test_del'
-    to_tfrecords(train[0:10], labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
-    to_tfrecords(test[0:10], labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
+    point = 10
+    train_name = f'train_{point}'
+    test_name = f'test_{point}'
+    to_tfrecords(train[0:point], labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
+    to_tfrecords(test[0:point], labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
 
