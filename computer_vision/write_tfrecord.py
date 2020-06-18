@@ -100,13 +100,13 @@ if __name__ == '__main__':
         for k,v in labeling_dict.items():
             f.write(str(v)+':'+k+'\n')
     train,test = seperate_data(image_path_list)
-    for dirpath,filename_list in train[0:5]:
+    for dirpath,filename_list in train:
         # 라벨을 숫자로 치환
         labelkey = dirpath.split('\\')[-1]
         label = labeling_dict[labelkey]
 
         to_tfrecords(dirpath,filename_list,label,'../../data/computer_vision_data/train.tfrecord')
-    for dirpath,filename_list in test[0:5]:
+    for dirpath,filename_list in test:
         # 라벨을 숫자로 치환
         labelkey = dirpath.split('\\')[-1]
         label = labeling_dict[labelkey]
