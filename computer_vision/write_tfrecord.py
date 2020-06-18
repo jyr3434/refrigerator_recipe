@@ -6,8 +6,8 @@ import tensorflow as tf
 from tensorflow.python.keras.preprocessing.image import load_img,img_to_array
 
 
-def get_path():
-    img_list = [(i[0], i[2]) for i in list(os.walk('../../data/crl_image/crl_image_resize'))[1:]]
+def get_path(folder):
+    img_list = [(i[0], i[2]) for i in list(os.walk(f'../../data/crl_image/{folder}'))[1:]]
     print(len(img_list))
     # for i in img_list:
     #     print(i[0],i[1],sep='\n')
@@ -96,12 +96,15 @@ def to_tfrecords(data,labeling_dict, tfrecords_name):
     writer.close()
 
 if __name__ == '__main__':
-    image_path_list = get_path()
+    image_path_list = get_path('crl_image_resize')
     labeling_dict = label_dict(image_path_list)
     with open('../../data/computer_vision_data/label_dict.txt', 'w', encoding='utf-8') as f:
         for k,v in labeling_dict.items():
             f.write(str(v)+':'+k+'\n')
     train,test = seperate_data(image_path_list)
 
-    to_tfrecords(train,labeling_dict,'../../data/computer_vision_data/train.tfrecord')
-    to_tfrecords(test,labeling_dict,'../../data/computer_vision_data/test.tfrecord')
+    train_name = 'train_del'
+    test_name = 'test_del'
+    to_tfrecords(train[0:10], labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
+    to_tfrecords(test[0:10], labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
+
