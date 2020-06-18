@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
         print('fitting 중입니다.')  # checking workflow output
 
-        model.fit(train_dataset, epochs=5, batch_size=20, verbose=0)
+        model.fit(train_dataset, epochs=1, batch_size=20, verbose=1)
 
         print(model.metrics_names)
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
         test_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/test.tfrecord',compression_type='GZIP')
         test_dataset = test_dataset.map(_parse_function)
         print('evaluate 중입니다.')  # checking workflow output
-        test_loss, test_acc = model.evaluate(test_dataset, verbose=0)
+        test_loss, test_acc = model.evaluate(test_dataset, verbose=1)
         # model.metric_names와 model.evaluate의 return 결과물은 연관성이 있으니
         # 둘의 관계를 공부하자
         print('test_acc : %.4f' % test_acc)
