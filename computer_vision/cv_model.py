@@ -20,28 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-# Create a description of the features.
-def _parse_function(example_proto):
-    # Parse the input `tf.Example` proto using the dictionary above.
-    feature_description = {
-        'image': tf.io.FixedLenFeature([], tf.string, default_value='' ),
-        'label': tf.io.FixedLenFeature([], tf.int64, default_value=0 )
-    }
-    # Load one example
-    parsed_features = tf.io.parse_single_example(example_proto, feature_description)
 
-    # Turn your saved image string into an array
-    parsed_features['image'] = tf.io.decode_raw(parsed_features['image'], out_type=tf.float32)
-    image = tf.cast(parsed_features['image'], tf.float32) / 255.0
-    image = tf.reshape(image, [1,224, 224, 3])
-
-    classes = 144
-    label = tf.one_hot(parsed_features['label'],classes)
-    label = tf.reshape(label, [1,classes])
-    # parsed_features['image'] = tf.reshape(parsed_features['image'],shape=(224,224,3))
-    # return {'image':parsed_features['image'],'label':parsed_features["label"],'x':parsed_features['x'],
-    #         'y':parsed_features['y'],'z':parsed_features['z']}
-    return image,label
 
 def conv1_layer(x):
     x = ZeroPadding2D(padding=(3, 3))(x)
@@ -226,8 +205,8 @@ def conv5_layer(x):
 
     return x
 
-def ResNet(input,output):
-    x,y,z = input
+def ResNet(inputs,outputs):
+    x,y,z = inputs
     # number of classes
     # K = 144
     input_tensor = Input(shape=(x, y, z), dtype='float32', name='input')
@@ -239,15 +218,15 @@ def ResNet(input,output):
     x = conv5_layer(x)
 
     x = GlobalAveragePooling2D()(x)
-    output_tensor = Dense(output, activation='softmax')(x)
+    output_tensor = Dense(outputs, activation='softmax')(x)
 
     resnet50 = Model(input_tensor, output_tensor)
     resnet50.compile(loss=losses.categorical_crossentropy, optimizer='rmsprop', metrics=['accuracy'])
     resnet50.summary()
     return resnet50
 
-def Own(input,output):
-    x, y, z = input
+def Own(inputs,outputs):
+    x, y, z = inputs
     model = Sequential()
     # convolution layer
     # padding = 'valid' (행열수 줄어듬), 'same' ( 행열수 보존 )
@@ -272,7 +251,7 @@ def Own(input,output):
     model.add(Dropout(0.3))
     model.add(Dense(units=512, activation=activations.relu))
     model.add(Dropout(0.3))
-    model.add(Dense(units=output, activation=activations.softmax))
+    model.add(Dense(units=outputs, activation=activations.softmax))
 
     model.compile(loss=losses.categorical_crossentropy, optimizer='rmsprop', metrics=['accuracy'])
     model.summary()

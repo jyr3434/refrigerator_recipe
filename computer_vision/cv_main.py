@@ -13,7 +13,8 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-from refrigerator_recipe.computer_vision.cv_model import _parse_function,ResNet,Own
+from refrigerator_recipe.computer_vision.cv_model import ResNet,Own
+from refrigerator_recipe.computer_vision.cv_dataset import DataSet
 
 if __name__ == '__main__':
     gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -24,25 +25,27 @@ if __name__ == '__main__':
             # 프로그램 시작시에 메모리 증가가 설정되어야만 합니다
             print(e)
     with tf.device('/GPU:0'):
+        inputs = (224,224,3)
+        outputs = 1000
+        dataset = DataSet(inputs,outputs)
         print(' ############모델 선택하기##################\n'
               ' Own : o \n'
               ' ResNet : r \n'
               ' .... : \n')
         command_key = input('키를 입력하세요( 대소문자 상관없음 ) : ').lower()
         if command_key in ('r','ㄱ'):
-            model = ResNet((224,224,3),144)
-            modelname = 'resnet_data'
+            model = ResNet(inputs,outputs)
+            modelname = 'resnet_data_1000'
         elif command_key in ('o','ㅐ'):
-            model = Own((224,224,3),144)
-            modelname = 'own_data'
+            model = Own(inputs,outputs)
+            modelname = 'own_data_1000'
 
         model_path = f'../../data/computer_vision_data/{modelname}_model.h5'
         if os.path.isfile(model_path):
             print("Yes. it is a file")
             model.load_weights(model_path)
-            test_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/test.tfrecord',
-                                                   compression_type='GZIP')
-            test_dataset = test_dataset.map(_parse_function)
+
+            test_dataset = dataset.tfrecord_dataset('../../data/computer_vision_data/test.tfrecord')
             print('evaluate 중입니다.')
             test_loss, test_acc = model.evaluate(test_dataset, verbose=1)
             print('test_acc : %.4f' % test_acc)
@@ -54,15 +57,11 @@ if __name__ == '__main__':
             print("Something exist")
         else:
             print("Nothing")
-            train_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/train.tfrecord',
-                                                    compression_type='GZIP')
-            train_dataset = train_dataset.map(_parse_function)
+            train_dataset = dataset.tfrecord_dataset('../../data/computer_vision_data/train.tfrecord')
             print('fitting 중입니다.')
             model.fit(train_dataset, epochs=1, batch_size=10, verbose=1)
 
-            test_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/test.tfrecord',
-                                                   compression_type='GZIP')
-            test_dataset = test_dataset.map(_parse_function)
+            test_dataset = dataset.tfrecord_dataset('../../data/computer_vision_data/test.tfrecord')
             print('evaluate 중입니다.')
             test_loss, test_acc = model.evaluate(test_dataset, verbose=1)
             print('test_acc : %.4f' % test_acc)
