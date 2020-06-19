@@ -42,6 +42,7 @@ class DataSet:
 
         classes = self.classes
         label = tf.one_hot(parsed_features['label'],classes)
+
         label = tf.reshape(label, [1,classes])
         # parsed_features['image'] = tf.reshape(parsed_features['image'],shape=(224,224,3))
         # return {'image':parsed_features['image'],'label':parsed_features["label"],'x':parsed_features['x'],

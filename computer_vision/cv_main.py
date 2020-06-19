@@ -15,7 +15,7 @@ import numpy as np
 import math
 from refrigerator_recipe.computer_vision.cv_model import ResNet,Own
 from refrigerator_recipe.computer_vision.cv_dataset import DataSet
-
+from refrigerator_recipe.computer_vision.cv_keras_model import keras_resnet50
 if __name__ == '__main__':
     gpus = tf.config.experimental.list_physical_devices('GPU')
     if gpus:
@@ -26,28 +26,33 @@ if __name__ == '__main__':
             print(e)
     with tf.device('/GPU:0'):
         inputs = (224,224,3)
-        outputs = 1000
+        outputs = 144
         dataset = DataSet(inputs,outputs)
         print(' ############모델 선택하기##################\n'
               ' Own : o \n'
               ' ResNet : r \n'
+              ' Keras : k \n'
               ' .... : \n')
         command_key = input('키를 입력하세요( 대소문자 상관없음 ) : ').lower()
         if command_key in ('r','ㄱ'):
             model = ResNet(inputs,outputs)
-            modelname = 'resnet_data_1000'
+            modelname = 'resnet_data'
         elif command_key in ('o','ㅐ'):
             model = Own(inputs,outputs)
-            modelname = 'own_data_1000'
+            modelname = 'own_data'
+        elif command_key in ('k','ㅏ'):
+            model = keras_resnet50(outputs)
+            modelname = 'keras_data'
 
+        # create or load model path
         model_path = f'../../data/computer_vision_data/{modelname}_model.h5'
+
         if os.path.isfile(model_path):
             print("Yes. it is a file")
             model.load_weights(model_path)
-
             test_dataset = dataset.tfrecord_dataset('../../data/computer_vision_data/test.tfrecord')
             print('evaluate 중입니다.')
-            test_loss, test_acc = model.evaluate(test_dataset, verbose=1)
+            test_loss, test_acc = model.evaluate(test_dataset,batch_size=10, verbose=1)
             print('test_acc : %.4f' % test_acc)
             print('test_loss : %.4f' % test_loss)
             print('-' * 50)
@@ -63,8 +68,9 @@ if __name__ == '__main__':
 
             test_dataset = dataset.tfrecord_dataset('../../data/computer_vision_data/test.tfrecord')
             print('evaluate 중입니다.')
-            test_loss, test_acc = model.evaluate(test_dataset, verbose=1)
+            test_loss, test_acc, test_top_k = model.evaluate(test_dataset, verbose=1)
             print('test_acc : %.4f' % test_acc)
             print('test_loss : %.4f' % test_loss)
+            print('test_top_k : %.4f' % test_top_k)
             print('-' * 50)
             model.save(model_path)
