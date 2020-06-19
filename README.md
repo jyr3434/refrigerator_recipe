@@ -44,4 +44,4 @@
    Model  | classes | data |epochs|batch size| accuracy | loss   
 --- | --- | --- | --- | --- | --- | ---   
 *Own*   | 144 | raw | 1 | 10 | 0 | 18.4984   
-*ResNet50* | 144 | raw | 1 | 10 | 0   | 24.9224
+*ResNet50* | 144 | raw | 1 | 10 | 0.0080   | 24.9224
