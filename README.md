@@ -41,7 +41,7 @@
  
  > 모델 성능 비교   
 >
-   Model  | classes | data |epochs|batch size| accuracy | loss   
---- | --- | --- | --- | --- | --- | ---   
-*Own*   | 144 | raw | 1 | 10 | 0 | 18.4984   
-*ResNet50* | 144 | raw | 1 | 10 | 0.0080   | 24.9224
+   Model  | classes | data |epochs|batch size| top-1 |top-5| loss   
+--- | --- | --- | --- | --- | --- | ---   |---
+*Own*   | 144 | raw | 1 | 10 | 0 | 0.0892 | 18.4984   
+*ResNet50* | 144 | raw | 1 | 10 | 0.0080  | 0.3797 | 24.9224

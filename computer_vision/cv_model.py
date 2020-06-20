@@ -253,7 +253,7 @@ def Own(inputs,outputs):
     model.add(Dropout(0.3))
     model.add(Dense(units=outputs, activation=activations.softmax))
 
-    model.compile(loss=losses.categorical_crossentropy, optimizer='rmsprop', metrics=['accuracy','top_k_categorical_accuracy'])
+    model.compile(loss=losses.categorical_crossentropy, optimizer='rmsprop', metrics=['accuracy','top_k_categorical_accuracy','categorical_crossentropy'])
     model.summary()
     # run_opts = tf.RunOptions(report_tensor_allocations_upon_oom=True)
     # model = tf.keras.utils.multi_gpu_model(model, gpus=2)

@@ -96,7 +96,7 @@ def to_tfrecords(data,labeling_dict, tfrecords_name):
     writer.close()
 
 if __name__ == '__main__':
-    image_path_list = get_path('crl_image_resize')
+    image_path_list = get_path('crl_image_resize_extraction_end')
     labeling_dict = label_dict(image_path_list)
     with open('../../data/computer_vision_data/label_dict.txt', 'w', encoding='utf-8') as f:
         for k,v in labeling_dict.items():
@@ -106,8 +106,11 @@ if __name__ == '__main__':
     point = 10
     # train_name = f'train_{point}'
     # test_name = f'test_{point}'
-    train_name = 'train'
-    test_name = 'test'
+    tfrecord_version = '_v3'
+
+
+    train_name = f'train{tfrecord_version}'
+    test_name = f'test{tfrecord_version}'
     to_tfrecords(train, labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
     to_tfrecords(test, labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
 
