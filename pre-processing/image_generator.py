@@ -23,9 +23,9 @@ class ImgGenerator:
             width_shift_range=0.2, # 수평 방향 이동 비율
             height_shift_range=0.2, # 수직 방향 이동 비율
             shear_range=0.2, # 반시계 방향의 전단 강도(radian)
-            zoom_range=0.2, # 랜덤하게 확대할 사진의 범위 지정
-            horizontal_flip=True, # 수평 방향으로 입력 반전
-            vertical_flip=True # 수직 방향으로 입력 반전
+            zoom_range=[0.2,0.9], # 랜덤하게 확대할 사진의 범위 지정
+            horizontal_flip=True # 수평 방향으로 입력 반전
+            # vertical_flip=True # 수직 방향으로 입력 반전
         )
         class_name = fp.split('\\')[-1]
         for img_fp in imgs:
@@ -45,7 +45,7 @@ class ImgGenerator:
 
 if __name__ == '__main__':
     IG = ImgGenerator()
-    img_list = IG.get_path('test')
+    img_list = IG.get_path('train')
     # print(img_list[0])
     for fp,imgs in img_list:
         IG.generator(fp,imgs)

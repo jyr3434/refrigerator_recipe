@@ -1,4 +1,4 @@
-from tensorflow.keras.applications import ResNet50,VGG16
+from tensorflow.keras.applications import ResNet50,VGG16,ResNet152
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras import models, layers
@@ -49,8 +49,31 @@ def keras_resnet50(clsses):
 
     # first: train2 only the top layers (which were randomly initialized)
     # i.e. freeze all convolutional resnet50 layers
-    # for layer in base_model.layers:
-    #     layer.trainable = False
+    for layer in base_model.layers:
+        layer.trainable = False
+    model.summary()
+    return model
+
+
+def keras_resnet152(clsses):
+    # create the base pre-trained model
+    base_model = ResNet152(weights='imagenet', include_top=False)
+
+    # add a global spatial average pooling layer
+    x = base_model.output
+    x = GlobalAveragePooling2D()(x)
+    # let's add a fully-connected layer
+    x = Dense(1024, activation='relu')(x)
+    # and a logistic layer -- let's say we have 200 classes
+    predictions = Dense(clsses, activation='softmax')(x)
+
+    # this is the model we will train2
+    model = Model(inputs=base_model.input, outputs=predictions)
+
+    # first: train2 only the top layers (which were randomly initialized)
+    # i.e. freeze all convolutional resnet50 layers
+    for layer in base_model.layers:
+        layer.trainable = False
     model.summary()
     return model
 

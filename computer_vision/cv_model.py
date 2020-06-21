@@ -224,6 +224,8 @@ def ResNet(inputs,outputs):
     resnet50.summary()
     return resnet50
 
+from tensorflow.keras.applications import ResNet50,VGG16
+
 def Own(inputs,outputs):
     x, y, z = inputs
     model = Sequential()
@@ -234,7 +236,10 @@ def Own(inputs,outputs):
     # 채널수는 흑백 : 1  컬럼 : 3(RGB)
     # strides = (1,1) default
     # convolution도 여러개로
-    model.add(Conv2D(filters=32, kernel_size=(3, 3), activation=activations.relu, input_shape=(x, y, z)))
+    model.add(
+        Conv2D(filters=64, kernel_size=(3, 3), activation=activations.relu, input_shape=(x, y, z),padding='same'))
+    model.add(
+        Conv2D(filters=64, kernel_size=(3, 3), activation=activations.relu, padding='same'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Conv2D(filters=64, kernel_size=(3, 3), activation=activations.relu))
@@ -246,14 +251,10 @@ def Own(inputs,outputs):
     model.add(Flatten())
 
     # full connected
-    model.add(Dense(units=512, activation=activations.relu))
-    model.add(Dropout(0.6))
-    model.add(Dense(units=512, activation=activations.relu))
-    model.add(Dropout(0.6))
+    model.add(Dense(units=1024, activation=activations.relu))
+    model.add(Dropout(0.3),name='Dropout_Regularization')
     model.add(Dense(units=outputs, activation=activations.softmax))
 
     model.summary()
-    # run_opts = tf.RunOptions(report_tensor_allocations_upon_oom=True)
-    # model = tf.keras.utils.multi_gpu_model(model, gpus=2)
 
     return model

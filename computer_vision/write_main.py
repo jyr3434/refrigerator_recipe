@@ -10,5 +10,5 @@ if __name__ == '__main__':
 
     train_name = f'train{tfrecord_version}'
     test_name = f'test{tfrecord_version}'
-    to_tfrecords(train[0:5], labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
-    to_tfrecords(test[0:5], labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
+    to_tfrecords(train, labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
+    to_tfrecords(test, labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')

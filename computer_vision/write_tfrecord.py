@@ -1,7 +1,5 @@
 import os
 import random
-import numpy as np
-from PIL import Image
 import tensorflow as tf
 from tensorflow.python.keras.preprocessing.image import load_img,img_to_array
 
@@ -9,8 +7,6 @@ from tensorflow.python.keras.preprocessing.image import load_img,img_to_array
 def get_path(folder):
     img_list = [(i[0], i[2]) for i in list(os.walk(f'../../data/crl_image/{folder}'))[1:]]
     print(len(img_list))
-    # for i in img_list:
-    #     print(i[0],i[1],sep='\n')
     return img_list  # [ ( str, list ) , ... ]
 
 def seperate_data(img_path):
@@ -74,23 +70,11 @@ def to_tfrecords(data,labeling_dict, tfrecords_name):
 
             image = load_img(filepath)
             image_ary = img_to_array(image)
-            # print(image_ary)
-            # print(image_ary.shape)
             _binary_image = image_ary.tostring()
 
-            # print(repr(_binary_image))
-            # _binary_label = labeling_dict[label].tobytes()
-            # filename = os.path.basename(filepath)
-
             string_set = tf.train.Example(features=tf.train.Features(feature={
-                # 'x': _int64_feature(image_ary.shape[0]),
-                # 'y': _int64_feature(image_ary.shape[1]),
-                # 'z': _int64_feature(image_ary.shape[2]),
                 'image': _bytes_feature(_binary_image),
                 'label': _int64_feature(label)
-                # 'mean': _float_feature(image.mean().astype(np.float32)),
-                # 'std': _float_feature(image.std().astype(np.float32)),
-                # 'filename': _bytes_feature(str.encode(filename))
             }))
 
             writer.write(string_set.SerializeToString())
@@ -104,11 +88,7 @@ if __name__ == '__main__':
             f.write(str(v)+':'+k+'\n')
     train,test = seperate_data(image_path_list)
 
-    point = 10
-    # train_name = f'train_{point}'
-    # test_name = f'test_{point}'
     tfrecord_version = '_resize'
-
 
     train_name = f'train{tfrecord_version}'
     test_name = f'test{tfrecord_version}'
