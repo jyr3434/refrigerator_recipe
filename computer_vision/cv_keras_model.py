@@ -1,4 +1,4 @@
-from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.applications import ResNet50,VGG16
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras import models, layers
@@ -14,6 +14,24 @@ from tensorflow.python.keras.layers import Dense,Activation # 레이어 추가
 from tensorflow.keras import activations,optimizers,metrics #케라스 자체로만 하면 최신 버전 사용 가능
 from tensorflow.python.keras.layers import Conv2D,MaxPooling2D,Flatten,Dropout
 
+def keras_vgg16(classes):
+    base_model = VGG16(weights='imagenet',include_top=False,input_shape=(224,224,3))
+
+    model = Sequential()
+    model.add(base_model)
+    model.add(Flatten())
+    model.add(Dense(256, activation='relu', name='Dense_Intermediate'))
+    model.add(Dropout(0.1, name='Dropout_Regularization'))
+    model.add(Dense(classes, activation='softmax', name='Output'))
+    for cnn_block_layer in model.layers[0].layers:
+        cnn_block_layer.trainable = False
+    model.layers[0].trainable = False
+    # Compile the model. I found that RMSprop with the default learning
+    # weight worked fine.
+    model.summary()
+
+    return model
+
 def keras_resnet50(clsses):
     # create the base pre-trained model
     base_model = ResNet50(weights='imagenet', include_top=False)
@@ -26,31 +44,30 @@ def keras_resnet50(clsses):
     # and a logistic layer -- let's say we have 200 classes
     predictions = Dense(clsses, activation='softmax')(x)
 
-    # this is the model we will train
+    # this is the model we will train2
     model = Model(inputs=base_model.input, outputs=predictions)
 
-    # first: train only the top layers (which were randomly initialized)
+    # first: train2 only the top layers (which were randomly initialized)
     # i.e. freeze all convolutional resnet50 layers
-    for layer in base_model.layers:
-        layer.trainable = False
+    # for layer in base_model.layers:
+    #     layer.trainable = False
     model.summary()
-    model.compile(optimizer='rmsprop', loss='categorical_crossentropy',metrics=['accuracy','top_k_categorical_accuracy'])
     return model
 
 '''
-# train the model on the new data for a few epochs
+# train2 the model on the new data for a few epochs
 model.fit(...)
 
 # at this point, the top layers are well trained and we can start fine-tuning
 # convolutional layers from inception V3. We will freeze the bottom N layers
-# and train the remaining top layers.
+# and train2 the remaining top layers.
 
 # let's visualize layer names and layer indices to see how many layers
 # we should freeze:
 for i, layer in enumerate(base_model.layers):
    print(i, layer.name)
 
-# we chose to train the top 2 inception blocks, i.e. we will freeze
+# we chose to train2 the top 2 inception blocks, i.e. we will freeze
 # the first 249 layers and unfreeze the rest:
 for layer in model.layers[:249]:
    layer.trainable = False
@@ -62,7 +79,7 @@ for layer in model.layers[249:]:
 from tensorflow.keras.optimizers import SGD
 model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='categorical_crossentropy')
 
-# we train our model again (this time fine-tuning the top 2 inception blocks
+# we train2 our model again (this time fine-tuning the top 2 inception blocks
 # alongside the top Dense layers
 model.fit(...)
 '''

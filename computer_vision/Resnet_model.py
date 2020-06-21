@@ -253,7 +253,7 @@ if __name__ == '__main__':
         resnet50 = Model(input_tensor, output_tensor)
         resnet50.summary()
 
-        train_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/train.tfrecord',
+        train_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/train2.tfrecord',
                                                 compression_type='GZIP')
         train_dataset = train_dataset.map(_parse_function)
 

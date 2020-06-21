@@ -47,7 +47,7 @@ if __name__ == '__main__':
             print(e)
     # with tf.device('/GPU:0'):
 
-    train_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/train.tfrecord',compression_type='GZIP')
+    train_dataset = tf.data.TFRecordDataset('../../data/computer_vision_data/train2.tfrecord',compression_type='GZIP')
     train_dataset = train_dataset.map(_parse_function)
 
     # print(raw_dataset)
