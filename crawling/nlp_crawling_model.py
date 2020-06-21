@@ -231,6 +231,6 @@ if __name__=='__main__':
     # # file_serial_name으로 구별 시킨다.
     # '''
     # file_serial_name = 'serial_n'
-    # detail.to_csv('../pre-processing/crawl_data/Crawl_recipe_detail_{}.csv'.format(file_serial_name))
+    # detail.to_csv('../pre_processing/crawl_data/Crawl_recipe_detail_{}.csv'.format(file_serial_name))
 
     print("--- %s seconds ---" % (time.time() - start_time))
