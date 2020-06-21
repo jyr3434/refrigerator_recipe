@@ -19,12 +19,12 @@ if __name__ == '__main__':
     with tf.device('/GPU:0'):
         inputs = (224,224,3)
         outputs = 144
-        epochs = 10
+        epochs = 1
         batchs = 512
         opt = 'rmsprop'
         # 같은 모델이라도 옵션이 다를수 있는 부가적인 이름을 추가해쥇요
-        modelname_detail = 'resize'
-        dataset_version = '_resize'
+        modelname_detail = 'extraction'
+        dataset_version = '_extraction'
 
         dataset = DataSet(inputs,outputs)
         print(' ############모델 선택하기##################\n'
@@ -80,14 +80,14 @@ if __name__ == '__main__':
 
 
         train_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/train{dataset_version}.tfrecord')
-        train_dataset = train_dataset.shuffle(buffer_size=500)
+        # train_dataset = train_dataset.shuffle(buffer_size=500)
         print('fitting 중입니다.')
         model.fit(train_dataset, epochs=epochs, batch_size=batchs, verbose=1, callbacks=[earlystop])
 
         model.save(model_path)
 
         test_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/test{dataset_version}.tfrecord')
-        test_dataset = test_dataset.shuffle(buffer_size=500)
+        # test_dataset = test_dataset.shuffle(buffer_size=500)
         print('evaluate 중입니다.')
         test_loss, test_acc, test_top_k, test_cate_cross = model.evaluate(test_dataset, batch_size=batchs, verbose=1)
         print('test_acc : %.4f' % test_acc)
