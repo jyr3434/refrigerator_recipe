@@ -1,7 +1,7 @@
 
 import os
 import tensorflow as tf
-from refrigerator_recipe.computer_vision.cv_model import ResNet,Own
+from refrigerator_recipe.computer_vision.cv_model import ResNet,Own,img64NN
 from refrigerator_recipe.computer_vision.cv_dataset import DataSet
 from refrigerator_recipe.computer_vision.cv_keras_model import keras_resnet50,keras_vgg16,keras_resnet152
 from tensorflow.python.keras import losses
@@ -17,14 +17,14 @@ if __name__ == '__main__':
             # 프로그램 시작시에 접근 가능한 장치가 설정되어야만 합니다
             print(e)
     with tf.device('/GPU:0'):
-        inputs = (224,224,3)
+        inputs = (64,64,3)
         outputs = 144
-        epochs = 50
-        batchs = 512
+        epochs = 5
+        batchs = 32
         opt = 'rmsprop'
         # 같은 모델이라도 옵션이 다를수 있는 부가적인 이름을 추가해쥇요
-        modelname_detail = 'extraction'
-        dataset_version = '_extraction'
+        modelname_detail = 'extraction_64'
+        dataset_version = '_extraction_64'
 
         dataset = DataSet(inputs,outputs)
         print(' ############모델 선택하기##################\n'
@@ -32,7 +32,8 @@ if __name__ == '__main__':
               ' ResNet : r \n'
               ' Keras50 : k \n'
               ' VGG16 : v \n'
-              ' Keras152 : 152'
+              ' Keras152 : 152\n'
+              ' img64 : 64\n'
               ' .... : \n')
         command_key = input('키를 입력하세요( 대소문자 상관없음 ) : ').lower()
 
@@ -53,6 +54,10 @@ if __name__ == '__main__':
         elif command_key in ('152'):
             model = keras_resnet152(outputs)
             modelname = f'keras152_{modelname_detail}'
+        elif command_key in ('64'):
+            model = img64NN(inputs,outputs)
+            modelname = f'img64_{modelname_detail}'
+
 
         earlystop = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=1)
         checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=f'../../data/computer_vision_data/{modelname}__chkpoint.h5',
@@ -80,14 +85,14 @@ if __name__ == '__main__':
 
 
         train_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/train{dataset_version}.tfrecord')
-        train_dataset = train_dataset.shuffle(buffer_size=500)
+        # train_dataset = train_dataset.shuffle(buffer_size=500)
         print('fitting 중입니다.')
         model.fit(train_dataset, epochs=epochs, batch_size=batchs, verbose=1, callbacks=[earlystop])
 
         model.save(model_path)
 
         test_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/test{dataset_version}.tfrecord')
-        test_dataset = test_dataset.shuffle(buffer_size=500)
+        # test_dataset = test_dataset.shuffle(buffer_size=500)
         print('evaluate 중입니다.')
         test_loss, test_acc, test_top_k, test_cate_cross = model.evaluate(test_dataset, batch_size=batchs, verbose=1)
         print('test_acc : %.4f' % test_acc)

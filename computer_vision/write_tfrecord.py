@@ -27,6 +27,30 @@ def label_dict(img_path):
     labeling_dict = {j[1]: j[0] for j in enumerate([i[0].split('\\')[-1] for i in img_path])}
     return labeling_dict
 
+def to_tfrecords(data,labeling_dict, tfrecords_name):
+    print("Start converting")
+    options = tf.io.TFRecordOptions(compression_type = 'GZIP')
+    writer = tf.io.TFRecordWriter(path=tfrecords_name, options=options)
+
+    for dirpath,image_list in data:
+        labelkey = dirpath.split('\\')[-1]
+        label = labeling_dict[labelkey]
+        print(labelkey)
+        for image_path in image_list:
+            filepath = '\\'.join((dirpath,image_path))
+
+            image = load_img(filepath)
+            image_ary = img_to_array(image)
+            _binary_image = image_ary.tostring()
+
+            string_set = tf.train.Example(features=tf.train.Features(feature={
+                'image': _bytes_feature(_binary_image),
+                'label': _int64_feature(label)
+            }))
+
+            writer.write(string_set.SerializeToString())
+    writer.close()
+
 def _int64_feature(value):
     """Wrapper for inserting int64 features into Example proto."""
     if not isinstance(value, list):
@@ -56,29 +80,7 @@ def _validate_text(text):
         return str(text)
 
 
-def to_tfrecords(data,labeling_dict, tfrecords_name):
-    print("Start converting")
-    options = tf.io.TFRecordOptions(compression_type = 'GZIP')
-    writer = tf.io.TFRecordWriter(path=tfrecords_name, options=options)
 
-    for dirpath,image_list in data:
-        labelkey = dirpath.split('\\')[-1]
-        label = labeling_dict[labelkey]
-        print(labelkey)
-        for image_path in image_list:
-            filepath = '\\'.join((dirpath,image_path))
-
-            image = load_img(filepath)
-            image_ary = img_to_array(image)
-            _binary_image = image_ary.tostring()
-
-            string_set = tf.train.Example(features=tf.train.Features(feature={
-                'image': _bytes_feature(_binary_image),
-                'label': _int64_feature(label)
-            }))
-
-            writer.write(string_set.SerializeToString())
-    writer.close()
 
 if __name__ == '__main__':
     image_path_list = get_path('crl_image_resize')

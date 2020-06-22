@@ -17,9 +17,6 @@ def _parse_function(example_proto):
     feature_description = {
         'image': tf.io.FixedLenFeature([], tf.string, default_value='' ),
         'label': tf.io.FixedLenFeature([], tf.int64, default_value=0 )
-        # 'x': tf.io.FixedLenFeature([],tf.int64, default_value=0),
-        # 'y': tf.io.FixedLenFeature([],tf.int64, default_value=0),
-        # 'z': tf.io.FixedLenFeature([],tf.int64, default_value=0)
     }
     # Load one example
     parsed_features = tf.io.parse_single_example(example_proto, feature_description)

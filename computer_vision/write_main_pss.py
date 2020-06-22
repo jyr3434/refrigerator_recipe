@@ -15,7 +15,7 @@ if __name__ == '__main__':
     # to_tfrecords(train, labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
     # to_tfrecords(test, labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
 
-    path = 'crl_image_extraction_64'
+    path = 'crl_image_extraction'
     # IG = ImgGenerator()
     # img_list = IG.get_path(path)
     # # print(img_list[0])
@@ -26,7 +26,9 @@ if __name__ == '__main__':
     train, test = seperate_data(img_list)
     labeling_dict = label_dict(test)
 
-    tfrecord_version = '_extraction_64'
+    tfrecord_version = '_extraction'
+
+    pool = Pool(processes=8)
 
     train_name = f'train{tfrecord_version}'
     test_name = f'test{tfrecord_version}'
