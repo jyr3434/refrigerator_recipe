@@ -15,7 +15,7 @@ class Resize:
         return wdlist
 
     def Mk_folder(self):
-        base_dir = 'D:/pss/python/refrigerator_recommend/data/crl_image/crl_image_extraction_64/'
+        base_dir = 'D:/Phycharm_pss/Recipe_Recommend/data/crl_image/crl_image_extraction_128/'
         os.chdir(base_dir)
         for idx in wdlist:
             path = os.path.join(base_dir, str(idx))
@@ -27,8 +27,8 @@ class Resize:
                 pass
 
     def Resize_img(self, word):
-        original_path = 'D:/pss/python/refrigerator_recommend/data/crl_image/crl_image_extraction/{}/'.format(word)
-        resized_path = 'D:/pss/python/refrigerator_recommend/data/crl_image/crl_image_extraction_64/{}/'.format(word)
+        original_path = 'D:/Phycharm_pss/Recipe_Recommend/data/crl_image/crl_image_extraction/{}/'.format(word)
+        resized_path = 'D:/Phycharm_pss/Recipe_Recommend/data/crl_image/crl_image_extraction_128/{}/'.format(word)
 
         file_list = os.listdir(original_path)
         img_list = []
@@ -45,7 +45,7 @@ class Resize:
             img = Image.open('%s%s'%(original_path, name))
             print(img)
             img_array = np.array(img)
-            img_resize = cv2.resize(img_array, (64,64), interpolation = cv2.INTER_AREA)
+            img_resize = cv2.resize(img_array, (128,128), interpolation = cv2.INTER_AREA)
             img = Image.fromarray(img_resize)
             print(resized_path,name)
             img.save(resized_path + name)

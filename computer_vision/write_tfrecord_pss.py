@@ -26,8 +26,8 @@ class WriteTfRecord:
 
     def label_dict(self,img_path):
         # 문자 라벨 숫자로 변환 144
-        labeling_dict = {j[1]: j[0] for j in enumerate([i[0].split('\\')[-1] for i in img_path])}
-        return labeling_dict
+        self.labeling_dict = {j[1]: j[0] for j in enumerate([i[0].split('\\')[-1] for i in img_path])}
+        # return labeling_dict
 
     def to_tfrecords(self,data,labeling_dict, tfrecords_name):
         print("Start converting")

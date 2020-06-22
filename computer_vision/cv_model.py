@@ -282,7 +282,7 @@ def img64NN(inputs,outputs):
                padding='same',use_bias=True))
     model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),
                            padding='same'))
-    model.add(Dropout(0.7))
+    model.add(Dropout(0.5))
 
     model.add(
         Conv2D(filters=64, kernel_size=(3, 3),strides=(1,1),
@@ -290,25 +290,25 @@ def img64NN(inputs,outputs):
                padding='same',use_bias=True))
     model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),
                            padding='same'))
-    model.add(Dropout(0.7))
+    model.add(Dropout(0.5))
     # L3
     model.add(
         Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1),
                activation='relu',
                padding='same', use_bias=True))
-    model.add(Dropout(0.7))
+    model.add(Dropout(0.5))
     # L4
     model.add(
         Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1),
                activation='relu',
                padding='same', use_bias=True))
-    model.add(Dropout(0.7))
+    model.add(Dropout(0.5))
     # L5
     model.add(
         Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1),
                activation='relu',
                padding='same', use_bias=True))
-    model.add(Dropout(0.7))
+    model.add(Dropout(0.5))
     model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2),
                            padding='same'))
 
@@ -317,8 +317,70 @@ def img64NN(inputs,outputs):
 
     # full connected
     model.add(Dense(units=384, activation=activations.relu,
-                    use_bias=True))
-    model.add(Dropout(0.7))
+                    kernel_regularizer=tf.keras.regularizers.l2(0.001),use_bias=True))
+    model.add(Dropout(0.5))
+    model.add(Dense(units=outputs, activation=activations.softmax))
+
+    model.summary()
+
+    return model
+
+def img224NN(inputs,outputs):
+    x, y, z = inputs
+    model = Sequential()
+    # convolution layer
+    # padding = 'valid' (행열수 줄어듬), 'same' ( 행열수 보존 )
+    # filter 개수는 보통 32,64...
+    # Conv2D : input_shape -> ( 높이,너비,채널수 )
+    # 채널수는 흑백 : 1  컬럼 : 3(RGB)
+    # strides = (1,1) default
+    # convolution도 여러개로
+    model.add(
+        Conv2D(filters=64, kernel_size=(5, 5),strides=(1,1),
+               activation='relu', input_shape=(x, y, z),
+               padding='same',use_bias=True))
+    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),
+                           padding='same'))
+    model.add(Dropout(0.5))
+
+    model.add(
+        Conv2D(filters=64, kernel_size=(3, 3),strides=(1,1),
+               activation='relu',
+               padding='same',use_bias=True))
+    model.add(MaxPooling2D(pool_size=(2, 2),strides=(2,2),
+                           padding='same'))
+    model.add(Dropout(0.5))
+    # L3
+    model.add(
+        Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1),
+               activation='relu',
+               padding='same', use_bias=True))
+    model.add(Dropout(0.5))
+    # L4
+    model.add(
+        Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1),
+               activation='relu',
+               padding='same', use_bias=True))
+    model.add(Dropout(0.5))
+    # L5
+    model.add(
+        Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1),
+               activation='relu',
+               padding='same', use_bias=True))
+    model.add(Dropout(0.5))
+    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2),
+                           padding='same'))
+
+    # 4차원 데이터를 2차원으로 축소하기
+    model.add(Flatten())
+
+    # full connected
+    model.add(Dense(units=384, activation=activations.relu,
+                    kernel_regularizer=tf.keras.regularizers.l2(0.001),use_bias=True))
+    model.add(Dropout(0.5))
+    model.add(Dense(units=192, activation=activations.relu,
+                    kernel_regularizer=tf.keras.regularizers.l2(0.001), use_bias=True))
+    model.add(Dropout(0.5))
     model.add(Dense(units=outputs, activation=activations.softmax))
 
     model.summary()

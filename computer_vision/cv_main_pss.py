@@ -19,8 +19,8 @@ if __name__ == '__main__':
     with tf.device('/GPU:0'):
         inputs = (64,64,3)
         outputs = 144
-        epochs = 5
-        batchs = 32
+        epochs = 200
+        batchs = 500
         opt = 'rmsprop'
         # 같은 모델이라도 옵션이 다를수 있는 부가적인 이름을 추가해쥇요
         modelname_detail = 'extraction_64'
@@ -85,9 +85,11 @@ if __name__ == '__main__':
 
 
         train_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/train{dataset_version}.tfrecord')
-        # train_dataset = train_dataset.shuffle(buffer_size=500)
+        train_dataset = train_dataset.shuffle(buffer_size=512)
+        valid_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/valid{dataset_version}.tfrecord')
+        valid_dataset = valid_dataset.shuffle(buffer_size=512)
         print('fitting 중입니다.')
-        model.fit(train_dataset, epochs=epochs, batch_size=batchs, verbose=1, callbacks=[earlystop])
+        model.fit(train_dataset, epochs=epochs, batch_size=batchs, verbose=1,validation_data=valid_dataset)
 
         model.save(model_path)
 

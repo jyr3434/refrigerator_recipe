@@ -24,11 +24,14 @@ if __name__ == '__main__':
 
     img_list = get_path(path)
     train, test = seperate_data(img_list)
+    train, valid = seperate_data(train)
     labeling_dict = label_dict(test)
 
     tfrecord_version = '_extraction_64'
 
     train_name = f'train{tfrecord_version}'
+    valid_name = f'valid{tfrecord_version}'
     test_name = f'test{tfrecord_version}'
     to_tfrecords(train, labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
+    to_tfrecords(valid, labeling_dict, f'../../data/computer_vision_data/{valid_name}.tfrecord')
     to_tfrecords(test, labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
