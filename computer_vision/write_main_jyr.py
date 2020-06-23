@@ -15,16 +15,16 @@ if __name__ == '__main__':
     # to_tfrecords(test, labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
 
     path = 'crl_image_resize_extraction_end'
-    IG = ImgGenerator()
-    img_list = IG.get_path(path)
-    # print(img_list[0])
-    for fp, imgs in img_list:
-        IG.generator(fp, imgs,path)
+    # IG = ImgGenerator()
+    # img_list = IG.get_path(path)
+    # # print(img_list[0])
+    # for fp, imgs in img_list:
+    #     IG.generator(fp, imgs,path)
 
     img_list = get_path(path)
     train, test = seperate_data(img_list)
     labeling_dict = label_dict(test)
-    tfrecord_version = '_extraction'
+    tfrecord_version = 'jyr_test64'
 
     train_name = f'train{tfrecord_version}'
     test_name = f'test{tfrecord_version}'
