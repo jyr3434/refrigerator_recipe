@@ -14,10 +14,10 @@ class Resize:
 
         return wdlist
 
-    def Mk_folder(self):
-        base_dir = 'C:/Users/TJ/Desktop/dyffo/Python/project_03/data/crl_image/crl_image_resize/'
+    def Mk_folder(self,dirlist):
+        base_dir = 'C:/Users/TJ/Desktop/dyffo/Python/project_03/data/crl_image/new_crl_image_resize/'
         os.chdir(base_dir)
-        for idx in wdlist:
+        for idx in dirlist:
             path = os.path.join(base_dir, str(idx))
             print(path)
             #print(os.getcwd())
@@ -27,8 +27,8 @@ class Resize:
                 pass
 
     def Resize_img(self, word):
-        original_path = 'C:/Users/TJ/Desktop/dyffo/Python/project_03/data/crl_image/{}/'.format(word)
-        resized_path = 'C:/Users/TJ/Desktop/dyffo/Python/project_03/data/crl_image/crl_image_resize/{}/'.format(word)
+        original_path = 'C:/Users/TJ/Desktop/dyffo/Python/project_03/data/crl_image/new_crl_image/{}/'.format(word)
+        resized_path = 'C:/Users/TJ/Desktop/dyffo/Python/project_03/data/crl_image/new_crl_image_resize/{}/'.format(word)
 
         file_list = os.listdir(original_path)
         img_list = []
@@ -57,16 +57,16 @@ from multiprocessing import Pool
 if __name__=='__main__':
     print('이미지크롤링 시작')
     start_time = time.time()
-    wdlist = Resize().img_search()
-    print(wdlist)
-    print(len(wdlist))
-
+    # wdlist = Resize().img_search()
+    # print(wdlist)
+    # print(len(wdlist))
+    dirlist = ['가자미', '감자', '건포도', '달걀', '고구마', '굴', '고기', '게', '맥주', '옥수수']
     # 각식재료별 이미지 별도 폴더 생성
-    Resize().Mk_folder()
+    Resize().Mk_folder(dirlist)
 
     pool = Pool(processes=8)
     #pool.map(ImgSch().img_crl, wdlist[0:])
-    pool.map(Resize().Resize_img, wdlist[0:], time.sleep(5))
+    pool.map(Resize().Resize_img, dirlist, time.sleep(5))
 
 
     print("--- %s seconds ---" % (time.time() - start_time))
