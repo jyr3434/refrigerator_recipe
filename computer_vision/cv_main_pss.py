@@ -21,7 +21,7 @@ if __name__ == '__main__':
         outputs = 144
         epochs = 20
         batchs = 500
-        opt = 'sgd'
+        opt = 'rmsprop'
         # 같은 모델이라도 옵션이 다를수 있는 부가적인 이름을 추가해쥇요
         modelname_detail = '_extraction_224'
         dataset_version = '_extraction_224'
