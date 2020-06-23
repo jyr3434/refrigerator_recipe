@@ -27,10 +27,10 @@ if __name__ == '__main__':
     train,valid = seperate_data(train)
     labeling_dict = label_dict(test)
 
-    tfrecord_version = '_extraction'
-    train = suffle_data(train)
-    valid = suffle_data(valid)
-    test = suffle_data(test)
+    tfrecord_version = '_extraction_64_cat_10'
+    train = suffle_data(train[0:10])
+    valid = suffle_data(valid[0:10])
+    test = suffle_data(test[0:10])
 
 
     # pool = Pool(processes=8)
