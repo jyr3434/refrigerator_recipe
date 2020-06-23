@@ -20,13 +20,13 @@ if __name__ == '__main__':
         inputs = (224,224,3)
         outputs = 144
         epochs = 20
-        batchs = 500
+        batchs = 32
         opt = 'adam'
 
         # 같은 모델이라도 옵션이 다를수 있는 부가적인 이름을 추가해쥇요
 
-        modelname_detail = 'extraction'
-        dataset_version = '_extraction'
+        modelname_detail = 'extraction_224'
+        dataset_version = '_extraction_224'
 
 
         dataset = DataSet(inputs,outputs)
@@ -92,9 +92,9 @@ if __name__ == '__main__':
 
         train_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/train{dataset_version}.tfrecord')
 
-        train_dataset = train_dataset.shuffle(buffer_size=20000).batch(batchs)
+        train_dataset = train_dataset.batch(batchs)
         valid_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/valid{dataset_version}.tfrecord')
-        valid_dataset = valid_dataset.shuffle(buffer_size=20000).batch(batchs)
+        valid_dataset = valid_dataset.batch(batchs)
         print('fitting 중입니다.')
         # model.fit(train_dataset, epochs=epochs,batch_size=batchs, verbose=1,validation_data=valid_dataset)
         model.fit(train_dataset, epochs=epochs, verbose=1,validation_data=valid_dataset)
