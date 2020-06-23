@@ -15,30 +15,30 @@ if __name__ == '__main__':
     # to_tfrecords(train, labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
     # to_tfrecords(test, labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
 
-    groupfolder = 'crl_image_extraction_64'
-    # IG = ImgGenerator()
-    # img_list = IG.get_path(path)
-    # # print(img_list[0])
-    # for fp, imgs in img_list:
-    #     IG.generator(fp, imgs,path)
+    groupfolder = 'crl_image_resize_extraction_10'
+    IG = ImgGenerator()
+    img_list = IG.get_path(groupfolder)
+    # print(img_list[0])
+    for fp, imgs in img_list:
+        IG.generator(fp, imgs,groupfolder)
 
     img_list = get_path(groupfolder)
-    train, test = seperate_data(img_list)
-    train,valid = seperate_data(train)
-    labeling_dict = label_dict(test)
+    # train, test = seperate_data(img_list)
+    train,valid = seperate_data(img_list)
+    labeling_dict = label_dict(valid)
 
-    tfrecord_version = '_extraction_64_cat_10'
+    tfrecord_version = '_extraction_224_cat_10'
     train = suffle_data(train[0:10])
     valid = suffle_data(valid[0:10])
-    test = suffle_data(test[0:10])
+    # test = suffle_data(test[0:10])
 
 
     # pool = Pool(processes=8)
     #
     train_name = f'train{tfrecord_version}'
-    test_name = f'test{tfrecord_version}'
     valid_name = f'valid{tfrecord_version}'
+    # test_name = f'test{tfrecord_version}'
     shuffle_to_record(train, labeling_dict,groupfolder, f'../../data/computer_vision_data/{train_name}.tfrecord')
     shuffle_to_record(valid, labeling_dict,groupfolder, f'../../data/computer_vision_data/{valid_name}.tfrecord')
-    shuffle_to_record(test, labeling_dict,groupfolder, f'../../data/computer_vision_data/{test_name}.tfrecord')
+    # shuffle_to_record(test, labeling_dict,groupfolder, f'../../data/computer_vision_data/{test_name}.tfrecord')
 

@@ -39,11 +39,11 @@ class DataSet:
         parsed_features['image'] = tf.io.decode_raw(parsed_features['image'], out_type=tf.float32)
         # image = parsed_features['image']
         image = tf.cast(parsed_features['image'], tf.float32) / 255.0
-        image = tf.reshape(image, [1,self.x, self.y, self.z])
+        image = tf.reshape(image, [self.x, self.y ,self.z])
 
         classes = self.classes
         label = tf.one_hot(parsed_features['label'],classes)
-        label = tf.reshape(label, [1,classes])
+        label = tf.reshape(label, [classes])
         # label = parsed_features['label']
         # parsed_features['image'] = tf.reshape(parsed_features['image'],shape=(224,224,3))
         # return {'image':parsed_features['image'],'label':parsed_features["label"],'x':parsed_features['x'],

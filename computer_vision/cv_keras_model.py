@@ -72,8 +72,8 @@ def keras_resnet152(clsses):
 
     # first: train2 only the top layers (which were randomly initialized)
     # i.e. freeze all convolutional resnet50 layers
-    for layer in base_model.layers:
-        layer.trainable = False
+    # for layer in base_model.layers:
+    #     layer.trainable = False
     model.summary()
     return model
 

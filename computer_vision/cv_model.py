@@ -12,7 +12,7 @@ from tensorflow.python.keras.utils import np_utils
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense,Activation # 레이어 추가
 from tensorflow.keras import activations,optimizers,metrics #케라스 자체로만 하면 최신 버전 사용 가능
-from tensorflow.python.keras.layers import Conv2D,MaxPooling2D,Flatten,Dropout
+from tensorflow.python.keras.layers import Conv3D,MaxPooling3D,Conv2D,MaxPooling2D,Flatten,Dropout
 
 import os
 import tensorflow as tf
