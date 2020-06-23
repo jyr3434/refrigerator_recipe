@@ -17,7 +17,7 @@ def seperate_data(img_path):
         lens = len(file_list)
         random.seed(1000)
         random.shuffle(file_list)
-        point = int(0.7*lens)
+        point = int(0.8*lens)
         train.append((path,file_list[:point]))
         test.append((path,file_list[point:]))
     return train,test
