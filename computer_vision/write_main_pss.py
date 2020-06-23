@@ -15,19 +15,19 @@ if __name__ == '__main__':
     # to_tfrecords(train, labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
     # to_tfrecords(test, labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
 
-    groupfolder = 'crl_image_resize_extraction_end'
-    # IG = ImgGenerator()
-    # img_list = IG.get_path(path)
-    # # print(img_list[0])
-    # for fp, imgs in img_list:
-    #     IG.generator(fp, imgs,path)
+    groupfolder = 'crl_image_resize_extraction_11'
+    IG = ImgGenerator()
+    img_list = IG.get_path(groupfolder)
+    # print(img_list[0])
+    for fp, imgs in img_list:
+        IG.generator(fp, imgs,groupfolder)
 
     img_list = get_path(groupfolder)
     train, test = seperate_data(img_list)
     train,valid = seperate_data(train)
     labeling_dict = label_dict(test)
 
-    tfrecord_version = '_extraction_224'
+    tfrecord_version = 'crl_image_11'
     train = suffle_data(train)
     valid = suffle_data(valid)
     test = suffle_data(test)

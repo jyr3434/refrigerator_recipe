@@ -6,7 +6,7 @@ from selenium import webdriver
 import pandas as pd
 from gensim.models import Word2Vec
 import re,time,urllib,os
-from webdriver_manager.chrome import ChromeDriverManager
+#from webdriver_manager.chrome import ChromeDriverManager
 
 
 
@@ -35,20 +35,22 @@ class ImgSch:
         #         #     word = (wdlist[i])
         return wdlist
 
-    def Mk_folder(self):
-        base_dir = '../../data/crawl_data/crl_image/'
+    def Mk_folder(self, dirlist):
+        base_dir = 'C:\\Users\\TJ\\Desktop\\dyffo\\Python\\project_03\\data\\crl_image\\new_crl_image\\'
         os.chdir(base_dir)
-        for idx in wdlist:
+        for idx in dirlist:
             path = os.path.join(base_dir, str(idx))
             print(path)
-            #print(os.getcwd())
+            print(os.getcwd())
             try:
                 os.mkdir(path)
             except Exception :
                 pass
 
 
-    def img_crl(self, word):
+    def img_crl(self, arg):
+        word = arg[0]
+        idx = arg[1]
         search = str(word)
 
         url = f'https://www.google.com/search?q={quote_plus(search)}&source=lnms&tbm=isch&sa=X&ved=' \
@@ -58,9 +60,32 @@ class ImgSch:
         path = 'D:\chromedriver.exe'
         driver = webdriver.Chrome(path)
         driver.get(url)
-        for i in range(300):
-            driver.execute_script("window.scrollBy(0,10000)")
-            driver.implicitly_wait(6)
+        driver.implicitly_wait(3)
+        while(True):
+            driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
+            time.sleep(0.5)
+            try:
+                element = driver.find_element_by_xpath('//input[@class="mye4qd"]')
+                if(element is not None):
+                    element.click()
+                    break
+            except Exception:
+                continue
+
+        errTime = 0
+        successTime = 0
+
+        while(errTime < 20 and successTime <10):
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(0.05)
+            try:
+                element = driver.find_element_by_xpath('//div[@class="mye4qd"]')
+                if(element is not None):
+                    element.click()
+                    successTime += 1
+                    errTime = 0
+            except Exception:
+                errTime += 1
 
 
         html = driver.page_source
@@ -78,10 +103,10 @@ class ImgSch:
 
 
         for i in imgurl:
-            urlretrieve(i, "../../data/crl_image/{}/" .format(search) + search + str(n) +  ".jpg")
+            urlretrieve(i, "C:\\Users\\TJ\\Desktop\\dyffo\\Python\\project_03\\data\\crl_image\\new_crl_image/{}/" .format(idx) + idx + str(n) +  ".jpg")
             n += 1
             #print(imgurl)
-            if (n > 500):
+            if (n > 1200 or n == None):
                 break
 
         driver.close()
@@ -91,16 +116,20 @@ from multiprocessing import Pool
 if __name__=='__main__':
     print('이미지크롤링 시작')
     start_time = time.time()
-    wdlist = ImgSch().img_search()
-    print(wdlist)
-    print(len(wdlist))
+    # wdlist = ImgSch().img_search()
+    # print(wdlist)
+    # print(len(wdlist))
 
+    wordlist = ['Sanddab fish', 'Potato', 'raisindry fruits', 'an egg', 'a sweetpotato', 'a oyster', 'a meat',
+                'a crab-food', 'a beer', 'an corn']
+    dirlist = ['가자미','감자','건포도','달걀','고구마','굴','고기','게','맥주','옥수수']
     # 각식재료별 이미지 별도 폴더 생성
-    ImgSch().Mk_folder()
+    ImgSch().Mk_folder(dirlist)
 
-    pool = Pool(processes=8)
+    crl_list = list(zip(wordlist,dirlist))
+    pool = Pool(processes=2)
     #pool.map(ImgSch().img_crl, wdlist[0:])
-    pool.map(ImgSch().img_crl, wdlist[0:], time.sleep(5))
+    pool.map(ImgSch().img_crl, crl_list)
 
 
     print("--- %s seconds ---" % (time.time() - start_time))

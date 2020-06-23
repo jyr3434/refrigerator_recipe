@@ -1,7 +1,7 @@
 
 import os
 import tensorflow as tf
-from refrigerator_recipe.computer_vision.cv_model import ResNet,Own,img64NN
+from refrigerator_recipe.computer_vision.cv_model import ResNet,Own,img64NN,img224NN
 from refrigerator_recipe.computer_vision.cv_dataset import DataSet
 from refrigerator_recipe.computer_vision.cv_keras_model import keras_resnet50,keras_vgg16,keras_resnet152
 from tensorflow.python.keras import losses
@@ -17,14 +17,16 @@ if __name__ == '__main__':
             # 프로그램 시작시에 접근 가능한 장치가 설정되어야만 합니다
             print(e)
     with tf.device('/GPU:0'):
-        inputs = (64,64,3)
-        outputs = 144
-        epochs = 20
+        inputs = (224,224,3)
+        outputs = 11
+        epochs = 10
         batchs = 500
         opt = 'rmsprop'
         # 같은 모델이라도 옵션이 다를수 있는 부가적인 이름을 추가해쥇요
-        modelname_detail = '_extraction_224'
-        dataset_version = '_extraction_224'
+
+        modelname_detail = 'crl_image_11'
+        dataset_version = 'crl_image_11'
+
 
         dataset = DataSet(inputs,outputs)
         print(' ############모델 선택하기##################\n'
@@ -34,6 +36,7 @@ if __name__ == '__main__':
               ' VGG16 : v \n'
               ' Keras152 : 152\n'
               ' img64 : 64\n'
+              ' img224 : 224\n'
               ' .... : \n')
         command_key = input('키를 입력하세요( 대소문자 상관없음 ) : ').lower()
 
@@ -57,7 +60,9 @@ if __name__ == '__main__':
         elif command_key in ('64'):
             model = img64NN(inputs,outputs)
             modelname = f'img64_{modelname_detail}'
-
+        elif command_key in ('224'):
+            model = img224NN(inputs,outputs)
+            modelname = f'imag224_{modelname_detail}'
 
         earlystop = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=1)
         checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=f'../../data/computer_vision_data/{modelname}__chkpoint.h5',
