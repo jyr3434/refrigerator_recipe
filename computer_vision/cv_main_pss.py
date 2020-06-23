@@ -85,9 +85,9 @@ if __name__ == '__main__':
 
 
         train_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/train{dataset_version}.tfrecord')
-        train_dataset = train_dataset.shuffle(buffer_size=512)
+        # train_dataset = train_dataset.shuffle(buffer_size=512)
         valid_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/valid{dataset_version}.tfrecord')
-        valid_dataset = valid_dataset.shuffle(buffer_size=512)
+        # valid_dataset = valid_dataset.shuffle(buffer_size=512)
         print('fitting 중입니다.')
         model.fit(train_dataset, epochs=epochs, batch_size=batchs, verbose=1,validation_data=valid_dataset)
 
