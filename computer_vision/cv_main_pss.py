@@ -19,7 +19,7 @@ if __name__ == '__main__':
     with tf.device('/GPU:0'):
         inputs = (224,224,3)
         outputs = 144
-        epochs = 20
+        epochs = 30
         batchs = 32
         opt = 'adam'
 

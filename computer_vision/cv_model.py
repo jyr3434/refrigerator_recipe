@@ -223,9 +223,9 @@ def ResNet(inputs,outputs):
     x = GlobalAveragePooling2D()(x)
 
 
-    x = Dense(1024, activation='relu')(x)
+    x = Dense(1024,kernel_regularizer=tf.keras.regularizers.l2(0.001), activation='relu')(x)
     # x = Dropout(0.5)(x)
-    x = Dense(512, activation='relu')(x)
+    x = Dense(512,kernel_regularizer=tf.keras.regularizers.l2(0.001), activation='relu')(x)
     # x = Dropout(0.5)(x)
 
     outputs_tensor= Dense(outputs,activation='softmax')(x)
