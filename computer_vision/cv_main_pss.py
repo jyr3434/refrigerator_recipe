@@ -1,6 +1,7 @@
 
 import os
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from refrigerator_recipe.computer_vision.cv_model import ResNet,Own,img64NN,img224NN
 from refrigerator_recipe.computer_vision.cv_dataset import DataSet
 from refrigerator_recipe.computer_vision.cv_keras_model import keras_resnet50,keras_vgg16,keras_resnet152
@@ -18,15 +19,15 @@ if __name__ == '__main__':
             print(e)
     with tf.device('/GPU:0'):
         inputs = (224,224,3)
-        outputs = 144
-        epochs = 30
-        batchs = 32
+        outputs = 10
+        epochs = 100
+        batchs = 16
         opt = 'adam'
 
         # 같은 모델이라도 옵션이 다를수 있는 부가적인 이름을 추가해쥇요
 
-        modelname_detail = 'extraction_224'
-        dataset_version = '_extraction_224'
+        modelname_detail = '_extraction_224_cat_10'
+        dataset_version = '_extraction_224_cat_10'
 
 
         dataset = DataSet(inputs,outputs)
@@ -45,29 +46,35 @@ if __name__ == '__main__':
         # choice model and built model graph of end compile
         if command_key in ('r','ㄱ'):
             model = ResNet(inputs,outputs)
-            modelname = f'resnet_{modelname_detail}'
+            modelname = f'resnet{modelname_detail}'
         elif command_key in ('o','ㅐ'):
             model = Own(inputs,outputs)
-            modelname = f'own_{modelname_detail}'
+            modelname = f'own{modelname_detail}'
         elif command_key in ('k','ㅏ'):
             model = keras_resnet50(outputs)
-            modelname = f'keras50_{modelname_detail}'
+            modelname = f'keras50{modelname_detail}'
         elif command_key in ('v','ㅍ'):
             model = keras_vgg16(outputs)
-            modelname = f'vgg16_{modelname_detail}'
+            modelname = f'vgg16{modelname_detail}'
         elif command_key in ('152'):
             model = keras_resnet152(outputs)
-            modelname = f'keras152_{modelname_detail}'
+            modelname = f'keras152{modelname_detail}'
         elif command_key in ('64'):
             model = img64NN(inputs,outputs)
-            modelname = f'img64_{modelname_detail}'
+            modelname = f'img64{modelname_detail}'
         elif command_key in ('224'):
             model = img224NN(inputs,outputs)
-
+            modelname = f'img224{modelname_detail}'
 
         earlystop = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=1)
-        checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=f'../../data/computer_vision_data/{modelname}__chkpoint.h5',
+        checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=f'../../data/computer_vision_data/{modelname}__checkpoint.h5',
                                                         monitor='accuracy')
+        model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+            filepath=f'../../data/computer_vision_data/{modelname}_checkpoint.h5',
+            save_weights_only=False,
+            monitor='val_accuracy',
+            mode='max',
+            save_best_only=True)
 
         model_path = f'../../data/computer_vision_data/{modelname}_model.h5'
         model.compile(loss=losses.categorical_crossentropy, optimizer=opt,
@@ -97,8 +104,24 @@ if __name__ == '__main__':
         valid_dataset = valid_dataset.batch(batchs)
         print('fitting 중입니다.')
         # model.fit(train_dataset, epochs=epochs,batch_size=batchs, verbose=1,validation_data=valid_dataset)
-        model.fit(train_dataset, epochs=epochs, verbose=1,validation_data=valid_dataset)
+        history = model.fit(train_dataset, epochs=epochs,callbacks=[model_checkpoint_callback], verbose=1,validation_data=valid_dataset)
         model.save(model_path)
+
+        ## draw graph ##
+        plt.figure(figsize=(16,10))
+        plt.plot(history.epoch, history.history['val_accuracy'],
+                       '--', label='val'.title() + '_accuracy')
+        plt.plot(history.epoch, history.history['accuracy'],
+                 color='r', label='tset'.title() + ' _accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('accuracy'.title())
+        plt.title(f'{modelname}_accuracy')
+        plt.legend()
+
+        plt.xlim([0, max(history.epoch)])
+        plt.savefig(f'../../data/graph/{modelname}_accuracy.jpg')
+        plt.show()
+        ## draw graph ##
 
         # test_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/test{dataset_version}.tfrecord')
         # test_dataset = test_dataset.shuffle(buffer_size=500)
