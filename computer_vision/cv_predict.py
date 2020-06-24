@@ -19,8 +19,12 @@ if __name__ == '__main__':
         except RuntimeError as e:
             print(e)
     with tf.device('/GPU:0'):
-        model_path = '../../data/computer_vision_data/resnet_extraction_224_cat_10_checkpoint.h5'
-        model = tf.keras.models.load_model(model_path)
+        model = ResNet((224,224,3),144)
+        print(model)
+        model_path = '../../data/computer_vision_data/resnet_extraction_224__epoch30_79.hdf5'
+        model.load_weights(model_path)
+        model.compile(loss='categorical_crossentropy', optimizer='adam',
+                      metrics=['accuracy', 'top_k_categorical_accuracy', 'categorical_crossentropy'])
 
         with open('../../data/computer_vision_data/label_dict.txt','r',encoding='utf-8') as f :
             labeling_dict = dict()
@@ -30,22 +34,27 @@ if __name__ == '__main__':
                 labeling_dict[key] = value
 
         # load image and convert to array( input shape)
+        print('predict')
 
-        if isinstance(model, tf.keras.Model):
-            print('model')
-            img = load_img('C:/Users/TJ/Desktop/crab.jpeg')
-            img_array = np.array(img)
-            img_array = cv2.resize(img_array, (224, 224), interpolation=cv2.INTER_AREA)
-            print(img_array.shape)
-            prediction = model.predict(img_array.reshape(1,224,224,3))
-            print(prediction[0])
-            # one_hot_encoding convert to integer
-            prediction = prediction[0]
-            answer_key = np.where(prediction==1)[0][0]
-            print(answer_key)
-            print(labeling_dict)
-            answer = labeling_dict[str(int(answer_key))]
-            print(answer)
+        print('model')
+        img = load_img('C:/Users/brian/Desktop/버섯.jpg')
+        print(img)
+        img_array = np.array(img)
+        img_array = cv2.resize(img_array, (224, 224), interpolation=cv2.INTER_AREA) /255.0
+        print(img_array.shape)
+        prediction = model.predict(img_array.reshape(1,224,224,3))
+        print(prediction[0])
+        # one_hot_encoding convert to integer
+        answer_key = np.argmax(prediction[0])
+        print(answer_key)
+        sf = tf.nn.softmax(prediction[0])
+        # answer_key = np.where(prediction[0]==1)[0][0]
+        print(answer_key)
+        print(labeling_dict)
+        answer = labeling_dict[str(int(answer_key))]
+        print(answer)
+        # print(sf)
+
 
         # inputs = (224, 224, 3)
         # outputs = 10
