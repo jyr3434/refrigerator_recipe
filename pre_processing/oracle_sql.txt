@@ -32,3 +32,22 @@ as
 select * from recipe_infos where regexp_like(id,'^[0-9]+$');
 commit;
 #########################################
+
+create table recipe_kwd_sources (
+    recipe_id varchar2(255),
+    rec_title clob default empty_clob(),
+    kwd_source clob default empty_clob()
+);
+commit;
+
+###############################################
+
+create table recipe_finals
+as
+select t1.recipe_id,
+t1.cat1,t1.cat2,t1.cat3,t1.cat4,t1.rec_title,t1.rec_sub,t1.rec_source,t1.rec_step,t2.kwd_source from
+ (select * from recipe_table ) t1
+ full outer join
+ (select * from recipe_kwd_sources ) t2
+ on t1.recipe_id = t2.recipe_id;
+commit;
