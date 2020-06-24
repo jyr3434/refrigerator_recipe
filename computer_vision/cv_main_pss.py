@@ -19,7 +19,7 @@ if __name__ == '__main__':
     with tf.device('/GPU:0'):
         inputs = (224,224,3)
         outputs = 144
-        epochs = 30
+        epochs = 10
         batchs = 32
         opt = 'adam'
 
@@ -68,7 +68,13 @@ if __name__ == '__main__':
         earlystop = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=1)
         checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=f'../../data/computer_vision_data/{modelname}__chkpoint.h5',
                                                         monitor='accuracy')
-
+        checkpoint_filepath = filepath=f'../../data/computer_vision_data/{modelname}__chkpoint.h5'
+        model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+            filepath=checkpoint_filepath,
+            save_weights_only=True,
+            monitor='val_accuracy',
+            mode='max',
+            save_best_only=True)
         model_path = f'../../data/computer_vision_data/{modelname}_model.h5'
         model.compile(loss=losses.categorical_crossentropy, optimizer=opt,
                       metrics=['accuracy', 'top_k_categorical_accuracy', 'categorical_crossentropy'])
@@ -97,7 +103,7 @@ if __name__ == '__main__':
         valid_dataset = valid_dataset.batch(batchs)
         print('fitting 중입니다.')
         # model.fit(train_dataset, epochs=epochs,batch_size=batchs, verbose=1,validation_data=valid_dataset)
-        model.fit(train_dataset, epochs=epochs, verbose=1,validation_data=valid_dataset)
+        model.fit(train_dataset, epochs=epochs, verbose=1,validation_data=valid_dataset,callbacks=[model_checkpoint_callback])
         model.save(model_path)
 
         # test_dataset = dataset.tfrecord_dataset(f'../../data/computer_vision_data/test{dataset_version}.tfrecord')
