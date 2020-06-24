@@ -2,6 +2,7 @@
 import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import pickle
 from refrigerator_recipe.computer_vision.cv_model import ResNet,Own,img64NN,img224NN
 from refrigerator_recipe.computer_vision.cv_dataset import DataSet
 from refrigerator_recipe.computer_vision.cv_keras_model import keras_resnet50,keras_vgg16,keras_resnet152
@@ -106,6 +107,9 @@ if __name__ == '__main__':
         # model.fit(train_dataset, epochs=epochs,batch_size=batchs, verbose=1,validation_data=valid_dataset)
         history = model.fit(train_dataset, epochs=epochs,callbacks=[model_checkpoint_callback], verbose=1,validation_data=valid_dataset)
         model.save(model_path)
+
+        with open(f'../../data/graph/trainHistory{modelname}', 'wb') as file_pi:
+            pickle.dump(history.history, file_pi)
 
         ## draw graph ##
         plt.figure(figsize=(16,10))
