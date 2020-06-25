@@ -1,6 +1,7 @@
 import os
 import cv2
 import pickle
+import math
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -8,6 +9,13 @@ import matplotlib.pyplot as plt
 
 from tensorflow.python.keras.preprocessing.image import load_img,img_to_array
 from refrigerator_recipe.computer_vision.cv_predict import Prediction
+
+def calculate_distance(x,y):
+    lens = len(x)
+    distance = 0
+    for i in range(lens):
+        distance += (x[i] - y[i])**2
+    return math.sqrt(distance)
 
 def find_point(SOURCES):
     SOURCE_LEN = len(SOURCES)
@@ -48,8 +56,31 @@ if __name__ == '__main__':
     recipeFrame = pd.read_csv(recipe_path)
     print(sourceFrame.shape,'\n',recipeFrame.shape)
 
-    my_point = find_point(['청경채','고추','고기'])
-    
-    for idx,row in recipeFrame.iterrows():
-        print(row.x,row.y,row.z)
+    sources = ['고기','청경채','고추']
 
+    my_point = find_point(sources)
+
+    distance_list = []
+    for idx,row in recipeFrame.iterrows():
+        recipe_point = (row.x,row.y,row.z)
+        distance = calculate_distance(my_point,recipe_point)
+        distance_list.append((distance,row.id,row.title,recipe_point))
+
+
+    distance_list = sorted(distance_list,key=lambda x : x[0])[:50]
+    [print(i) for i in distance_list]
+
+    ############################### DRAW GRAPH ##################################
+    # mpl.rcParams['legend.fontsize'] = 10  # 그냥 오른쪽 위에 뜨는 글자크기 설정이다.
+    # mpl.rc('font', family='Malgun Gothic')
+    # fig = plt.figure(figsize=(20,20))  # 이건 꼭 입력해야한다.
+    # ax = fig.gca(projection='3d')
+    # theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)
+    # z = recipeFrame['z']
+    # x = recipeFrame['x']
+    # y = recipeFrame['y']
+    # ax.plot(x, y, z,'o', label='parametric curve')  # 위에서 정의한 x,y,z 가지고 그래프그린거다.
+    # ax.legend()  # 오른쪽 위에 나오는 글자 코드다. 이거 없애면 글자 사라진다. 없애도 좋다.
+    # for t,x,y,z in zip(recipeFrame['title'],x,y,z):
+    #     ax.text(x,y,z,t)
+    # plt.show()
