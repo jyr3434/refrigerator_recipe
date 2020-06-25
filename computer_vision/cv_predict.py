@@ -37,7 +37,7 @@ if __name__ == '__main__':
         print('predict')
 
         print('model')
-        img = load_img('C:/Users/brian/Desktop/버섯.jpg')
+        img = load_img('C:/Users/brian/Desktop/가지.jpg')
         print(img)
         img_array = np.array(img)
         img_array = cv2.resize(img_array, (224, 224), interpolation=cv2.INTER_AREA) /255.0
