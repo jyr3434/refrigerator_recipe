@@ -2,7 +2,7 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from gensim.models import word2vec,Word2Vec
 
-
+import random
 import numpy as np
 import pandas as pd
 import math
@@ -83,19 +83,23 @@ if __name__ == '__main__':
 
     # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
     # pcaFrame = embedding.pca_w2v(model, n_components=50)
-    # print(pcaFrame)
-
-    # ##### make recipe tsne
-    # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
-
-    ####### noun_vocab : 학습된 명사 모록
+    # # print(pcaFrame)
+    #
+    # # ###### noun_vocab : 학습된 명사 모록
     # noun_vocab = [w for w in model.wv.vocab]
     # tsneFrame = embedding.tsne_w2v(pcaFrame, noun_vocab,n_components=3)
+    # print(tsneFrame)
+    # tsneFrame.columns = ['x','y','z']
+    # tsneFrame = tsneFrame + 1000
+    # tsneFrame['source'] = noun_vocab
+    # tsneFrame.to_csv('../../../data/nlp_data/source_embedding.csv',index=False)
     # real_source = list(tsneFrame.index)
     #
-    # sourceframe = pd.read_csv('../../../data/nlp_data/kwd_source.csv')
-    # cond = pd.notna(sourceframe['kwd_source'])
-    # sourceframe = sourceframe.loc[cond,:]
+    # sourceframe = pd.read_csv('../../../data/nlp_data/kwd_source.csv') # 레시피별 위치를 구하기 위해서 가져온다. ( 레시피가 가지고 있는 식재료 데이터 : 중복제거)
+    # print(sourceframe.shape)
+
+
+    # print(sourceframe.shape)
     # recipe_data = list()
     # #### 중심좌표 구하기
     # for idx,row in sourceframe.iterrows():
@@ -104,29 +108,31 @@ if __name__ == '__main__':
     #     z = 0
     #
     #     title = row.rec_title
+    #     id = row.id
+    #
     #     source_list = [ i for i in row.kwd_source.split('|') if i in real_source ]
     #     if len(source_list):
     #         n = len(source_list)
     #         for source in source_list:
-    #             x += tsneFrame.loc[source,'d1'] + 1000
-    #             y += tsneFrame.loc[source,'d2'] + 1000
-    #             z += tsneFrame.loc[source,'d3'] + 1000
+    #             x += tsneFrame.loc[source,'x']
+    #             y += tsneFrame.loc[source,'y']
+    #             z += tsneFrame.loc[source,'z']
     #
     #         mean_x = x/n
     #         mean_y = y/n
     #         mean_z = z/n
     #
-    #         recipe_data.append({'title':title,'x':mean_x,'y':mean_y,'z':mean_z})
+    #         recipe_data.append({'id':id,'title':title,'x':mean_x,'y':mean_y,'z':mean_z})
     # # #
     # recipeFrame = pd.DataFrame(recipe_data)
     # print(recipeFrame)
-    # recipeFrame.to_csv('../../../data/nlp_data/recipe_embedding.csv')
+    # recipeFrame.to_csv('../../../data/nlp_data/recipe_embedding.csv',index=False)
 
     ###########
-    import random
-    ran = np.random.randint(1,10000,100)
-    print(ran)
-    recipeFrame = pd.read_csv('../../../data/nlp_data/recipe_embedding.csv',index_col=0).iloc[ran,:]
+
+    # ran = np.random.randint(1,10000,50)
+    # print(ran)
+    # recipeFrame = pd.read_csv('../../../data/nlp_data/recipe_embedding.csv',index_col=0).iloc[ran,:]
     # recipeFrame.set_index(keys='title',inplace=True)
     # print(recipeFrame)
     # # embedding.show_tsne(recipeFrame.iloc[:1000])
@@ -147,20 +153,20 @@ if __name__ == '__main__':
     # for i in sort_list:
     #     print(i)
 
-    mpl.rcParams['legend.fontsize'] = 10  # 그냥 오른쪽 위에 뜨는 글자크기 설정이다.
-    mpl.rc('font', family='Malgun Gothic')
-    fig = plt.figure()  # 이건 꼭 입력해야한다.
-    ax = fig.gca(projection='3d')
-    theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)  # 각도의 범위는 -4파이 에서 +4파이
-    z = recipeFrame['z']  # z는 -2부터 2까지 올라간다.
-    r = z ** 2 + 1  # z값이 변함에 따라 반지름이 바뀔 것이다.
-    x = recipeFrame['x']  # 나선구조를 만들기 위해 x는 sin함수
-    y = recipeFrame['y']  # 나선구조를 만들기 위해 y는 cos함수
-    ax.plot(x, y, z,'o', label='parametric curve')  # 위에서 정의한 x,y,z 가지고 그래프그린거다.
-    ax.legend()  # 오른쪽 위에 나오는 글자 코드다. 이거 없애면 글자 사라진다. 없애도 좋다.
-    for t,x,y,z in zip(recipeFrame['title'],x,y,z):
-        ax.text(x,y,z,t)
-    plt.show()
+    ############################### DRAW GRAPH ##################################
+    # mpl.rcParams['legend.fontsize'] = 10  # 그냥 오른쪽 위에 뜨는 글자크기 설정이다.
+    # mpl.rc('font', family='Malgun Gothic')
+    # fig = plt.figure(figsize=(20,20))  # 이건 꼭 입력해야한다.
+    # ax = fig.gca(projection='3d')
+    # theta = np.linspace(-4 * np.pi, 4 * np.pi, 100)  # 각도의 범위는 -4파이 에서 +4파이
+    # z = recipeFrame['z']  # z는 -2부터 2까지 올라간다.
+    # x = recipeFrame['x']  # 나선구조를 만들기 위해 x는 sin함수
+    # y = recipeFrame['y']  # 나선구조를 만들기 위해 y는 cos함수
+    # ax.plot(x, y, z,'o', label='parametric curve')  # 위에서 정의한 x,y,z 가지고 그래프그린거다.
+    # ax.legend()  # 오른쪽 위에 나오는 글자 코드다. 이거 없애면 글자 사라진다. 없애도 좋다.
+    # for t,x,y,z in zip(recipeFrame['title'],x,y,z):
+    #     ax.text(x,y,z,t)
+    # plt.show()
 
 
 
