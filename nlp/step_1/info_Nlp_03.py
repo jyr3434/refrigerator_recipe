@@ -93,7 +93,7 @@ class Source:
 from multiprocessing import Pool
 if __name__ == '__main__':
 
-    filename1 = '../../../data/crawl_data/recipe_dropna.csv'
+    filename1 = '../../../data/pre_process_data/recipe_dropna.csv'
     data1 = pd.read_csv(filename1, encoding='UTF-8', index_col=0)
     # mycol = ['recipe_id','cat1','cat2','cat3','cat4']
     data1 = pd.DataFrame(data1)
@@ -114,6 +114,8 @@ if __name__ == '__main__':
             norm_str_list.append(None)
 
     df = pd.DataFrame({'rec_title':data1.loc[:,'rec_title'],'kwd_source':norm_str_list})
+    cond = pd.notna(df['kwd_source'])
+    df = df.loc[cond, :]
     df.to_csv('../../../data/nlp_data/kwd_source.csv',encoding='utf-8')
     norm_source_total = [ i for i in norm_source_total if i is not None ]
     print(len(norm_source_total))

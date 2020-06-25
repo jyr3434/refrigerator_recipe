@@ -35,3 +35,8 @@
 > 4. [3]번 작업 불가시 sqldeveloper 데이터 임포트를 사용한다.
 > 5. [ 3 or 4 ]후 이상값(insert format error)을 제외하고 테이블을 완성한다.
 > 6. [5]테이블을 select하여  recipe_nlp file로 저장한다.
+
+>## 파일
+>1. recipe_raw.csv
+>2. recipe_dropna.csv
+>3. recipe_nlp.csv
