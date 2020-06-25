@@ -77,56 +77,58 @@ if __name__ == '__main__':
     tsneFrame = embedding.tsne_w2v(model,n_components=2)
     embedding.show_tsne(tsneFrame)
     '''
-    # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
-    # tsneFrame = embedding.tsne_w2v(model, n_components=4)
-    # print(tsneFrame)
-
-    # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
-    # pcaFrame = embedding.pca_w2v(model, n_components=50)
-    # # print(pcaFrame)
-    #
-    # # ###### noun_vocab : 학습된 명사 모록
-    # noun_vocab = [w for w in model.wv.vocab]
-    # tsneFrame = embedding.tsne_w2v(pcaFrame, noun_vocab,n_components=3)
-    # print(tsneFrame)
-    # tsneFrame.columns = ['x','y','z']
-    # tsneFrame = tsneFrame + 1000
-    # tsneFrame['source'] = noun_vocab
-    # tsneFrame.to_csv('../../../data/nlp_data/source_embedding.csv',index=False)
-    # real_source = list(tsneFrame.index)
-    #
-    # sourceframe = pd.read_csv('../../../data/nlp_data/kwd_source.csv') # 레시피별 위치를 구하기 위해서 가져온다. ( 레시피가 가지고 있는 식재료 데이터 : 중복제거)
-    # print(sourceframe.shape)
 
 
-    # print(sourceframe.shape)
-    # recipe_data = list()
-    # #### 중심좌표 구하기
-    # for idx,row in sourceframe.iterrows():
-    #     x = 0
-    #     y = 0
-    #     z = 0
-    #
-    #     title = row.rec_title
-    #     id = row.id
-    #
-    #     source_list = [ i for i in row.kwd_source.split('|') if i in real_source ]
-    #     if len(source_list):
-    #         n = len(source_list)
-    #         for source in source_list:
-    #             x += tsneFrame.loc[source,'x']
-    #             y += tsneFrame.loc[source,'y']
-    #             z += tsneFrame.loc[source,'z']
-    #
-    #         mean_x = x/n
-    #         mean_y = y/n
-    #         mean_z = z/n
-    #
-    #         recipe_data.append({'id':id,'title':title,'x':mean_x,'y':mean_y,'z':mean_z})
-    # # #
-    # recipeFrame = pd.DataFrame(recipe_data)
-    # print(recipeFrame)
-    # recipeFrame.to_csv('../../../data/nlp_data/recipe_embedding.csv',index=False)
+    model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
+    pcaFrame = embedding.pca_w2v(model, n_components=50)
+    print(pcaFrame)
+
+    # ###### noun_vocab : 학습된 명사 모록
+    noun_vocab = [w for w in model.wv.vocab]
+    tsneFrame = embedding.tsne_w2v(pcaFrame, noun_vocab,n_components=3)
+    print(tsneFrame)
+    tsneFrame.columns = ['x','y','z']
+    tsneFrame = tsneFrame + 1000
+    tsneFrame['source'] = noun_vocab
+    tsneFrame.to_csv('../../../data/nlp_data/source_sum_embedding.csv',index=False)
+    real_source = list(tsneFrame.index)
+
+    sourceframe = pd.read_csv('../../../data/nlp_data/kwd_source.csv') # 레시피별 위치를 구하기 위해서 가져온다. ( 레시피가 가지고 있는 식재료 데이터 : 중복제거)
+    print(sourceframe.shape)
+
+    # cond = pd.notna(sourceframe['kwd_source'])
+    # sourceframe = sourceframe.loc[cond,:]
+    # sourceframe.to_csv('../../../data/nlp_data/kwd_source.csv',index=False)
+
+    print(sourceframe.shape)
+    recipe_data = list()
+    #### 중심좌표 구하기
+    for idx,row in sourceframe.iterrows():
+        x = 0
+        y = 0
+        z = 0
+
+        title = row.rec_title
+        id = row.id
+        print(row.kwd_source)
+        source_list = [ i for i in row.kwd_source.split('|') if i in real_source ]
+        if len(source_list):
+            n = len(source_list)
+            for source in source_list:
+                x += tsneFrame.loc[source,'x']
+                y += tsneFrame.loc[source,'y']
+                z += tsneFrame.loc[source,'z']
+
+            # mean_x = x/n
+            # mean_y = y/n
+            # mean_z = z/n
+
+            # recipe_data.append({'id':id,'title':title,'x':mean_x,'y':mean_y,'z':mean_z})
+            recipe_data.append({'id': id, 'title': title, 'x': x, 'y': y, 'z': z})
+    # #
+    recipeFrame = pd.DataFrame(recipe_data)
+    print(recipeFrame)
+    recipeFrame.to_csv('../../../data/nlp_data/recipe_sum_embedding.csv',index=False)
 
     ###########
 

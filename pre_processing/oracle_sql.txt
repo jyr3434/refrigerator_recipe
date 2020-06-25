@@ -40,6 +40,8 @@ create table recipe_kwd_sources (
 );
 commit;
 
+### kwd_source.csv
+
 ###############################################
 
 create table recipe_finals

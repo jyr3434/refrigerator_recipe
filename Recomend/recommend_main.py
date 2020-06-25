@@ -17,6 +17,18 @@ def calculate_distance(x,y):
         distance += (x[i] - y[i])**2
     return math.sqrt(distance)
 
+def calculate_consine(x,y):
+    lens = len(x)
+    x_scale = 0
+    y_scale = 0
+    xy_dot = 0
+    for i in range(lens):
+        x_scale += x[i]**2
+        y_scale += y[i]**2
+        xy_dot += x[i]*y[i]
+
+    return xy_dot/(math.sqrt(x_scale)*math.sqrt(y_scale))
+
 def find_point(SOURCES):
     SOURCE_LEN = len(SOURCES)
 
@@ -29,9 +41,9 @@ def find_point(SOURCES):
         find_point_y += sourceFrame.loc[source,'y']
         find_point_z += sourceFrame.loc[source,'z']
 
-    find_point_x = find_point_x/SOURCE_LEN
-    find_point_y = find_point_y/SOURCE_LEN
-    find_point_z = find_point_z/SOURCE_LEN
+    # find_point_x = find_point_x/SOURCE_LEN
+    # find_point_y = find_point_y/SOURCE_LEN
+    # find_point_z = find_point_z/SOURCE_LEN
     return find_point_x,find_point_y,find_point_z
 
 if __name__ == '__main__':
@@ -50,22 +62,24 @@ if __name__ == '__main__':
 
 
     ############# 판별 이미지로 레시피 검색 #############
-    source_path = '../../data/nlp_data/source_embedding.csv'
-    recipe_path = '../../data/nlp_data/recipe_embedding.csv'
+    source_path = '../../data/nlp_data/source_sum_embedding.csv'
+    recipe_path = '../../data/nlp_data/recipe_sum_embedding.csv'
     sourceFrame = pd.read_csv(source_path,index_col=3)
     recipeFrame = pd.read_csv(recipe_path)
     print(sourceFrame.shape,'\n',recipeFrame.shape)
 
-    sources = ['고기','청경채','고추']
+    sources = ['팝콘']
 
     my_point = find_point(sources)
 
     distance_list = []
     for idx,row in recipeFrame.iterrows():
         recipe_point = (row.x,row.y,row.z)
-        distance = calculate_distance(my_point,recipe_point)
-        distance_list.append((distance,row.id,row.title,recipe_point))
+        # distance = calculate_distance(my_point,recipe_point)
+        # distance_list.append((distance,row.id,row.title,recipe_point))
 
+        cosine = calculate_consine(my_point, recipe_point)
+        distance_list.append((cosine, row.id, row.title, recipe_point))
 
     distance_list = sorted(distance_list,key=lambda x : x[0])[:50]
     [print(i) for i in distance_list]
