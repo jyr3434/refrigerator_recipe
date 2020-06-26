@@ -1,0 +1,53 @@
+<html>
+
+<head>
+    <title>SVHN Model as a Flask API</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<script type="text/javascript">
+                const browseBtn = document.querySelector('.browse-btn');
+                const realInput = document.querySelector('#real-input');
+
+                browseBtn.addEventListener('click',()=>{
+	            realInput.click();
+                });
+</script>
+<h1>Flask And Google House Number Predictor</h1>
+<div class="agile-its">
+    <h2>Flask with ML Web Service</h2>
+    <div class="w3layouts">
+        <div class="photos-upload-view">
+
+            <form id="upload" action="/predict" method="POST" enctype="multipart/form-data">
+                <div class="upload-btn-wrapper">
+                    <input type="file" id="real-input" class="image_inputType_file" accept="img/*" required multiple>
+                    <button class="btn">사진업로드</button>
+                    <h3>이미지 미리보기</h3>
+                    <div id="imagePreview">
+	                <img id="img" />
+                    </div>
+
+<!--                    <button class="btn">이미지 업로드</button>-->
+<!--                    <input type="file" value="Upload" name="image"-->
+<!--                    onchange="previewImage(this,'View_area')" class="image_inputType_file" accept="img/*" required multiple>-->
+<!--                    <div id='View_area' style = 'position:relative;-->
+<!--                    width: 100px; height: 100px; color:black;-->
+<!--                    border: 0px solid black; display:inline'>-->
+<!--                    </div>-->
+                </div>
+                <input type="submit" value="예측 결과">
+                {% if label %}
+                    <span class="result_lable">
+                        {{ label }}
+                    </span>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
