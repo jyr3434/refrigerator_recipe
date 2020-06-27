@@ -62,26 +62,54 @@ if __name__ == '__main__':
 
 
     ############# 판별 이미지로 레시피 검색 #############
-    source_path = '../../data/nlp_data/source_sum_embedding.csv'
-    recipe_path = '../../data/nlp_data/recipe_sum_embedding.csv'
+    source_path = '../../data/nlp_data/source_embedding.csv'
+    recipe_path = '../../data/nlp_data/recipe_embedding.csv'
     sourceFrame = pd.read_csv(source_path,index_col=3)
     recipeFrame = pd.read_csv(recipe_path)
     print(sourceFrame.shape,'\n',recipeFrame.shape)
 
-    sources = ['팝콘']
+    sources = ['버터']
+    select_cat = ('볶음','일상',None,None)
 
     my_point = find_point(sources)
 
-    distance_list = []
+    filter1Data = []
     for idx,row in recipeFrame.iterrows():
+        recipe_category = (row.cat1,row.cat2,row.cat3,row.cat4)
+        category_check = 0
+        select_length = 0
+        for i in range(4):
+            if select_cat[i] is not None:
+                select_length +=1
+                if select_cat[i] == recipe_category[i]:
+                    category_check +=1
+
+        # 카테고리에 해당되는지 여부
+        source_check = 0
+        if select_length == category_check :
+            recipe_sources = row.kwd_source.split('|')
+            for source in sources:
+                if source in recipe_sources:
+                    source_check += 1
+            if source_check > 0 :
+                filter1Data.append({ 'id':row.id,
+                                     'title':row.title,
+                                     'x':row.x,
+                                     'y':row.y,
+                                     'z':row.z})
+        print(select_length,category_check,source_check)
+    # for recipeFrame.iterrows()
+
+    FilterFrame = pd.DataFrame(filter1Data)
+    print(FilterFrame.shape)
+
+    distance_list = []
+    for idx,row in FilterFrame.iterrows():
         recipe_point = (row.x,row.y,row.z)
-        # distance = calculate_distance(my_point,recipe_point)
-        # distance_list.append((distance,row.id,row.title,recipe_point))
+        distance = calculate_distance(my_point,recipe_point)
+        distance_list.append((distance,row.id,row.title,recipe_point))
 
-        cosine = calculate_consine(my_point, recipe_point)
-        distance_list.append((cosine, row.id, row.title, recipe_point))
-
-    distance_list = sorted(distance_list,key=lambda x : x[0],reverse=True)[:50]
+    distance_list = sorted(distance_list,key=lambda x : x[0])[:50]
     [print(i) for i in distance_list]
 
     ############################### DRAW GRAPH ##################################

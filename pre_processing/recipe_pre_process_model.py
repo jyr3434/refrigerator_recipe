@@ -93,7 +93,7 @@ class RecipePreProcess:
         # print(sql)
         return sql
 
-    def select_all_db(self):
+    def select_all_db(self,path):
         conn = None
         cur = None
         try:
@@ -101,11 +101,11 @@ class RecipePreProcess:
             conn = cx_Oracle.connect(loginfo, encoding='utf-8')
             cur = conn.cursor()
             # recipe_table ( 최종 필터링된 테이블 ) 존재하는 상태에서 불러올수있다.
-            sql = ' select * from recipe_table '
+            sql = ' select * from recipe_finals '
             db_df = pd.read_sql(sql=sql, con=conn)
             db_df.columns = [column.lower() for column in db_df]
             print(db_df.shape)
-            db_df.to_csv('../../data/pre_process_data/recipe_nlp.csv', index=False)
+            db_df.to_csv(path, index=False)
         except Exception as err:
             print(err)
         finally:
@@ -147,9 +147,10 @@ if __name__ == '__main__':
     ######################## step5 #####################
 
     ###################### step6 ###########################
-    recipepp.select_all_db()
+    recipepp.select_all_db('../../data/pre_process_data/recipe_nlp.csv')
 
-
+    ####################################################################
+    recipepp.select_all_db('../../data/nlp_data/recipe_nlp.csv')
 
     '''
     Index(['recipe_id', 'cat1', 'cat2', 'cat3', 'cat4', 'rec_title',
