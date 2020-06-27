@@ -81,7 +81,7 @@ if __name__ == '__main__':
         cosine = calculate_consine(my_point, recipe_point)
         distance_list.append((cosine, row.id, row.title, recipe_point))
 
-    distance_list = sorted(distance_list,key=lambda x : x[0])[:50]
+    distance_list = sorted(distance_list,key=lambda x : x[0],reverse=True)[:50]
     [print(i) for i in distance_list]
 
     ############################### DRAW GRAPH ##################################
