@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+ 
+{% block content %}
+<div>
+  <h1>About</h1>
+
+</div>
+      <h3>이미지 미리보기</h3>
+      <div id="imagePreview">
+      <img id="img" />
+          {% if file %}
+           <img href="{{ url_for('static', filename='11.png') }}" />
+          {% else %}
+              <h2>이미지가 안왔습니다.</h2>
+          {% endif %}
+
+      </div>
+{% endblock %}
