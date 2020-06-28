@@ -1,6 +1,4 @@
-{% extends 'layout.html' %}
- 
-{% block content %}
+
 <div>
   <h1>About</h1>
 
@@ -8,11 +6,32 @@
       <h3>이미지 미리보기</h3>
       <div id="imagePreview">
       <img id="img" />
-          {% if file %}
-           <img href="{{ url_for('static', filename='11.png') }}" />
+          {% if label %}
+           <img src="{{ url_for('static', filename='*.jpg') }}"width="150" height="150" />
           {% else %}
               <h2>이미지가 안왔습니다.</h2>
           {% endif %}
 
       </div>
-{% endblock %}
+<div class= "container">
+       <h2>Results:</h2>
+       <table class="table table-striped">
+       <thead>
+       <tr>
+           <th>result</th>
+<!--           <th>Name</th>-->
+<!--           <th>Prices</th>-->
+<!--           <th>Sizes</th>-->
+<!--           <th>Shoe Type</th>-->
+       </tr>
+       </thead>
+           <tbody>
+       {% if label %}
+       <tr>
+           <td>{{ result }}</td> <h1>조건은 성립</h1>
+       </tr>
+       {% else %}
+       <h1>드롭박스 값 오지못함</h1>
+       {% endif %}
+       </table>
+</div>

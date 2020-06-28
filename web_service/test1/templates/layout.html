@@ -65,7 +65,7 @@
     {% block content %}{% endblock %}
     </main>
     <div>
-        <select class="browsers1" name="browsers2" title="ddd" >
+        <select class="browsers1" name="cat1" id="cat1"  >
                         <option value="cat1" selected disabled>카테고리1</option>
                         <option value="크롬">크롬</option>
                         <option value="사파리">사파리</option>
@@ -74,7 +74,7 @@
                         <option value="파이어폭스" >파이어폭스</option>
                         <option value="오페라">오페라</option>
                     </select>
-                    <select class="#browsers2" name="browsers" >
+                    <select class="#browsers1" name="cat2" id="cat2" >
                         <option value="cat2" selected disabled>카테고리2</option>
                         <option value="크롬">크롬</option>
                         <option value="사파리">사파리</option>
@@ -83,7 +83,7 @@
                         <option value="파이어폭스" >파이어폭스</option>
                         <option value="오페라">오페라</option>
                     </select>
-                    <select class="browsers3" name="browsers" >
+                    <select class="browsers1" name="cat3" id="cat3" >
                         <option value="cat3" selected disabled>카테고리3</option>
                         <option value="크롬">크롬</option>
                         <option value="사파리">사파리</option>
@@ -92,7 +92,7 @@
                         <option value="파이어폭스" >파이어폭스</option>
                         <option value="오페라">오페라</option>
                     </select>
-                    <select class="browsers4" name="browsers" >
+                    <select class="browsers1" name="cat4" id="cat4" >
                         <option value="cat4" selected disabled>카테고리4</option>
                         <option value="크롬">크롬</option>
                         <option value="사파리">사파리</option>
@@ -102,13 +102,19 @@
                         <option value="오페라">오페라</option>
                     </select>
                     <div class="photos-upload-view">
-            <form id="upload" action="/predict" method="POST" enctype="multipart/form-data">
-                <div class="upload-btn-wrapper">
-                    <input type="file" name="image" id="real-input" class="image_inputType_file" accept="img/*" required multiple>
-                    <button class="browse-btn">사진업로드</button>
+<!--            <form id="upload" action="/predict" method="POST" enctype="multipart/form-data">-->
+<!--                <div class="upload-btn-wrapper">-->
+<!--                    <input type="file" name="image" id="real-input" class="image_inputType_file" accept="img/*" required multiple>-->
+<!--                    <button class="browse-btn">사진업로드</button>-->
 
-                </div>
-            </form>
+<!--                </div>-->
+<!--                </form>-->
+                <form action = "http://localhost:5000/fileUpload" method = "POST"
+                     enctype = "multipart/form-data">
+                     <input type = "file" name = "file" />
+                     <input type = "submit"/>
+                  </form>
+
          </div>
     </div>
   </body>

@@ -1,6 +1,8 @@
-from flask import Flask, render_template, redirect, request, url_for, send_file
+from flask import Flask, render_template, redirect, request, url_for, send_file, jsonify
 import flask
 from datetime import datetime
+from werkzeug.utils import secure_filename
+
 app = Flask(__name__)
 
 posts = [
@@ -32,15 +34,45 @@ def index():
 def about():
     return render_template('about.html', title='About')
 
+@app.route('/fileUpload', methods = ['GET', 'POST'])
 
-@app.route('/predict', methods=['GET', 'POST'])
-def make_prediction():
-    if request.method == 'POST':
+# 이미지 파일 업로드 및 출력 시도
+def upload_file():
+   if request.method == 'POST':
 
-        # 업로드 파일 처리 분기
-        file = request.files['image']
-        if not file: return render_template('about.html', label="No Files")
-        return render_template('about.html')
+      file = request.files['file']
+      if not file: return '파일없음' + render_template(label="No Files")
+      #저장할 경로 + 파일명
+      file.save('C:/Users/ddd/Desktop/mypython/Project03/refrigerator_recipe/web_service/test1/image/' + secure_filename(file.filename))
+      # return 'uploads 디렉토리 -> 파일 업로드 성공!'
 
-if __name__ == "__main__":
-    app.run(debug=True)
+      return 'uploads 디렉토리 -> 파일 업로드 성공!' + render_template('about.html', label="yes Files")
+
+# def make_prediction():
+#     if request.method == 'POST':
+#
+#         # 업로드 파일 처리 분기
+#         file = request.files['image']
+#         if not file: return render_template('about.html', label="No Files")
+#         return render_template('about.html', label="yes Files")
+
+# 드롭박스 값 출력 시도
+@app.route('/layout', methods = ['GET', 'POST'])
+def get_updated_settings():
+    if request.method == 'GET':
+       # good for debug, make sure args were sent
+       print ( request.args )
+       cat1 = request.args.get('cat1', 'default_if_none')
+       cat2 = request.args.get('cat2', 'default_if_none')
+       cat3 = request.args.get('cat3', 'default_if_none')
+       cat4 = request.args.get('cat4', 'default_if_none')
+       result = (cat1 + cat2 + cat3 + cat4)
+       #output = {}
+       # I have no idea what this returns...just doing a list generator here assuming we get a list of values
+       # output['am_1'] = [x for x in db.hget(skey, '1am')]
+       # output['am_2'] = [x for x in db.hget(skey, '1am')]
+       return render_template('about.html', result=result, label="result")
+
+if __name__ == '__main__':
+    #서버 실행
+   app.run(debug = True)
