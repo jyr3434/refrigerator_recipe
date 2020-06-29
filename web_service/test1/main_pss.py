@@ -37,24 +37,24 @@ def about():
     return render_template('about.html', title='About')
 
 @app.route('/fileUpload', methods = ['GET', 'POST'])
-
 # 이미지 파일 업로드 및 출력 시도
 def upload_file():
    if request.method == 'POST':
-
-      file = request.files['file']
-      if not file: return '파일없음' + render_template(label="No Files")
+      cat1 = request.form['cate1']
+      cat2 = request.form['cate2']
+      cat3 = request.form['cate3']
+      cat4 = request.form['cate4']
+      result = (cat1,cat2,cat3,cat4)
+      print('resutl :',result)
       #저장할 경로 + 파일명
-      print(file.filename)
       print(app_root)
-      file.save(app_root+'/static/naver/'+file.filename)
-      # file.save('C:/Users/ddd/Desktop/mypython/Project03/refrigerator_recipe/web_service/test1/image/' + file.filename)
       # return 'uploads 디렉토리 -> 파일 업로드 성공!'
       filenames = []
       for file in request.files.getlist('file'):
           file.save(app_root + '/static/naver/' + file.filename)
           filenames.append(file.filename)
-      return 'uploads 디렉토리 -> 파일 업로드 성공!' + render_template('about.html', label=filenames)
+          print(app_root)
+      return 'uploads 디렉토리 -> 파일 업로드 성공!' + render_template('about.html', label=filenames,result=None)
 
 # def make_prediction():
 #     if request.method == 'POST':
@@ -75,6 +75,7 @@ def get_updated_settings():
        cat3 = request.args.get('cat3', 'default_if_none')
        cat4 = request.args.get('cat4', 'default_if_none')
        result = (cat1 + cat2 + cat3 + cat4)
+       print(result)
        #output = {}
        # I have no idea what this returns...just doing a list generator here assuming we get a list of values
        # output['am_1'] = [x for x in db.hget(skey, '1am')]

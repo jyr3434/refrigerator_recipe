@@ -3,14 +3,15 @@
   <h1>About</h1>
 
 </div>
+      <h3>{{result}}</h3>
       <h3>이미지 미리보기</h3>
       <div id="imagePreview">
       <img id="img" />
           {% if label %}
-              <script>
-                  for 
-              </script>
-           <img src="{{ url_for('static', filename='naver/'+label) }}"width="150" height="150" />
+              {% for i in label %}
+                    <p>{{i}}</p>
+                    <img src="{{ url_for('static', filename='naver/'+i) }}"width="150" height="150" />
+              {% endfor %}
           {% else %}
               <h2>이미지가 안왔습니다.</h2>
           {% endif %}
