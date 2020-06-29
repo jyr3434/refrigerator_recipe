@@ -17,7 +17,7 @@ def seperate_data(img_path):
         lens = len(file_list)
         random.seed(1000)
         random.shuffle(file_list)
-        point = int(0.7*lens)
+        point = int(0.8*lens)
         train.append((path,file_list[:point]))
         test.append((path,file_list[point:]))
     return train,test
@@ -79,20 +79,39 @@ def _validate_text(text):
     else:
         return str(text)
 
+def suffle_data(data):
+    shuffle_result = []
+    for l,img_list in data:
+        key = l.split('\\')[-1]
+        imsi = [(img,key) for img in img_list]
+        shuffle_result.extend(imsi)
+    # print(len(shuffle_result))
+    random.seed(54321)
+    random.shuffle(shuffle_result)
+    return shuffle_result
 
+def shuffle_to_record(data,labeling_dict,groupfolder, tfrecords_name):
+    print("Start converting")
+    options = tf.io.TFRecordOptions(compression_type='GZIP')
+    writer = tf.io.TFRecordWriter(path=tfrecords_name, options=options)
+    dirpath = f'../../data/crl_image/{groupfolder}'
+    end = len(data)
+    cnt = 0
+    for filename,labelkey in data:
+        label = labeling_dict[labelkey]
+        filepath = '\\'.join((dirpath,labelkey,filename))
+        image = load_img(filepath)
+        image_ary = img_to_array(image)
+        _binary_image = image_ary.tostring()
 
-
+        string_set = tf.train.Example(features=tf.train.Features(feature={
+            'image': _bytes_feature(_binary_image),
+            'label': _int64_feature(label)
+        }))
+        writer.write(string_set.SerializeToString())
+        cnt +=1
+        if cnt % 10000 == 0 :
+            print(cnt,'/',end)
+    writer.close()
 if __name__ == '__main__':
-    image_path_list = get_path('crl_image_resize')
-    labeling_dict = label_dict(image_path_list)
-    with open('../../data/computer_vision_data/label_dict.txt', 'w', encoding='utf-8') as f:
-        for k,v in labeling_dict.items():
-            f.write(str(v)+':'+k+'\n')
-    train,test = seperate_data(image_path_list)
-
-    tfrecord_version = '_resize'
-
-    train_name = f'train{tfrecord_version}'
-    test_name = f'test{tfrecord_version}'
-    to_tfrecords(train, labeling_dict, f'../../data/computer_vision_data/{train_name}.tfrecord')
-    to_tfrecords(test, labeling_dict, f'../../data/computer_vision_data/{test_name}.tfrecord')
+    pass

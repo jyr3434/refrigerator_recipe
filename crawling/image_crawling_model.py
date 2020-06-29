@@ -8,9 +8,6 @@ from gensim.models import Word2Vec
 import re,time,urllib,os
 #from webdriver_manager.chrome import ChromeDriverManager
 
-
-
-
 # for item in keydf_wd:
 #     if isinstance(item,str):
 #         item  = item.split('|')
