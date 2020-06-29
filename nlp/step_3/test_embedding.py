@@ -53,12 +53,13 @@ class Embedding:
     #only 2d
     def  show_tsne(self,tsneFrame):
         plt.rc('font', family='Malgun Gothic')
-        plt.figure()
+        plt.rc('font', size=20)
+        plt.figure(figsize=(15,15))
         plt.scatter(tsneFrame['d1'], tsneFrame['d2'])
 
         plt.title(f'재료의 명사 관계도')
         for word, pos in tsneFrame.iterrows():
-            plt.annotate(word, pos, fontsize=5)
+            plt.annotate(word, pos, fontsize=10)
         plt.savefig('../../../data/nlp_data/imsi.png', dpi=600, bbox_inches='tight')
         plt.show()
         ### 좌표 그리고 그 표를 파일로 저장하기
@@ -67,70 +68,72 @@ class Embedding:
 if __name__ == '__main__':
 
     embedding = Embedding('../../../data/nlp_data/norm_kwd_step.csv')
-    ''''
+
     #### make source model ####
-    w2vdata = embedding.make_word2vecData()
-    model = embedding.embedding_W2V(w2vdata)
-    embedding.save_model(model,"../../../data/nlp_data/source_word2vec.model")
-
-    model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
-    tsneFrame = embedding.tsne_w2v(model,n_components=2)
-    embedding.show_tsne(tsneFrame)
-    '''
-
+    # w2vdata = embedding.make_word2vecData()
+    # model = embedding.embedding_W2V(w2vdata)
+    # embedding.save_model(model,"../../../data/nlp_data/source_word2vec.model")
 
     model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
     pcaFrame = embedding.pca_w2v(model, n_components=50)
-    print(pcaFrame)
-
-    # ###### noun_vocab : 학습된 명사 모록
     noun_vocab = [w for w in model.wv.vocab]
-    tsneFrame = embedding.tsne_w2v(pcaFrame, noun_vocab,n_components=3)
-    print(tsneFrame)
-    tsneFrame.columns = ['x','y','z']
-    tsneFrame = tsneFrame + 1000
-    tsneFrame['source'] = noun_vocab
-    tsneFrame.to_csv('../../../data/nlp_data/source_embedding.csv',index=False)
-    real_source = list(tsneFrame.index)
+    tsneFrame = embedding.tsne_w2v(pcaFrame,noun_vocab,n_components=2)
+    embedding.show_tsne(tsneFrame)
 
-    sourceframe = pd.read_csv('../../../data/nlp_data/recipe_nlp.csv') # 레시피별 위치를 구하기 위해서 가져온다. ( 레시피가 가지고 있는 식재료 데이터 : 중복제거)
-    print(sourceframe.shape)
 
-    cond = pd.notna(sourceframe['kwd_source'])
-    sourceframe = sourceframe.loc[cond,:]
-    sourceframe.to_csv('../../../data/nlp_data/recipe_nlp.csv',index=False)
 
-    print(sourceframe.shape)
-    recipe_data = list()
-    #### 중심좌표 구하기
-    for idx,row in sourceframe.iterrows():
-        x = 0
-        y = 0
-        z = 0
-
-        title = row.rec_title
-        id = row.recipe_id
-        cat1,cat2,cat3,cat4 = row.cat1,row.cat2,row.cat3,row.cat4
-        kwd_source = row.kwd_source
-        print(row.kwd_source)
-        source_list = [ i for i in row.kwd_source.split('|') if i in real_source ]
-        if len(source_list):
-            n = len(source_list)
-            for source in source_list:
-                x += tsneFrame.loc[source,'x']
-                y += tsneFrame.loc[source,'y']
-                z += tsneFrame.loc[source,'z']
-
-            mean_x = x/n
-            mean_y = y/n
-            mean_z = z/n
-
-            recipe_data.append({'id':id,'cat1':cat1,'cat2':cat2,'cat3':cat3,'cat4':cat4,'title':title,'kwd_source':kwd_source,'x':mean_x,'y':mean_y,'z':mean_z})
-            # recipe_data.append({'id': id, 'title': title,'kwd_source':kwd_source, 'x': x, 'y': y, 'z': z})
+    # model = Word2Vec.load('../../../data/nlp_data/source_word2vec.model')
+    # pcaFrame = embedding.pca_w2v(model, n_components=50)
+    # print(pcaFrame)
     # #
-    recipeFrame = pd.DataFrame(recipe_data)
-    print(recipeFrame.shape)
-    recipeFrame.to_csv('../../../data/nlp_data/recipe_embedding.csv',index=False)
+    # # ###### noun_vocab : 학습된 명사 모록
+    # noun_vocab = [w for w in model.wv.vocab]
+    # tsneFrame = embedding.tsne_w2v(pcaFrame, noun_vocab,n_components=3)
+    # print(tsneFrame)
+    # tsneFrame.columns = ['x','y','z']
+    # tsneFrame = tsneFrame + 1000
+    # tsneFrame['source'] = noun_vocab
+    # tsneFrame.to_csv('../../../data/nlp_data/source_embedding.csv',index=False)
+    # real_source = list(tsneFrame.index)
+    #
+    # sourceframe = pd.read_csv('../../../data/nlp_data/recipe_nlp.csv') # 레시피별 위치를 구하기 위해서 가져온다. ( 레시피가 가지고 있는 식재료 데이터 : 중복제거)
+    # print(sourceframe.shape)
+    #
+    # cond = pd.notna(sourceframe['kwd_source'])
+    # sourceframe = sourceframe.loc[cond,:]
+    # sourceframe.to_csv('../../../data/nlp_data/recipe_nlp.csv',index=False)
+    #
+    # print(sourceframe.shape)
+    # recipe_data = list()
+    # #### 중심좌표 구하기
+    # for idx,row in sourceframe.iterrows():
+    #     x = 0
+    #     y = 0
+    #     z = 0
+    #
+    #     title = row.rec_title
+    #     id = row.recipe_id
+    #     cat1,cat2,cat3,cat4 = row.cat1,row.cat2,row.cat3,row.cat4
+    #     kwd_source = row.kwd_source
+    #     print(row.kwd_source)
+    #     source_list = [ i for i in row.kwd_source.split('|') if i in real_source ]
+    #     if len(source_list):
+    #         n = len(source_list)
+    #         for source in source_list:
+    #             x += tsneFrame.loc[source,'x']
+    #             y += tsneFrame.loc[source,'y']
+    #             z += tsneFrame.loc[source,'z']
+    #
+    #         mean_x = x/n
+    #         mean_y = y/n
+    #         mean_z = z/n
+    #
+    #         recipe_data.append({'id':id,'cat1':cat1,'cat2':cat2,'cat3':cat3,'cat4':cat4,'title':title,'kwd_source':kwd_source,'x':mean_x,'y':mean_y,'z':mean_z})
+    #         # recipe_data.append({'id': id, 'title': title,'kwd_source':kwd_source, 'x': x, 'y': y, 'z': z})
+    # # #
+    # recipeFrame = pd.DataFrame(recipe_data)
+    # print(recipeFrame.shape)
+    # recipeFrame.to_csv('../../../data/nlp_data/recipe_embedding.csv',index=False)
 
     ###########
 

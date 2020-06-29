@@ -1,11 +1,11 @@
 import os
-import cv2
+import tensorflow as tf
 import pickle
+import cv2
 import time
 import math
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 

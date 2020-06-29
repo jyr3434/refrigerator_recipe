@@ -13,7 +13,7 @@ class Prediction:
         f = open(label_path, 'r', encoding='utf-8')
         label_list = f.readlines()
         for label in label_list:
-            key, value = label.split(':')
+            key, value = label.strip('\n').split(':')
             self.labeling_dict[key] = value
 
     def predict_label(self,img_array):
@@ -22,6 +22,6 @@ class Prediction:
         prediction = np.argmax(prediction[0])
         prediction = self.labeling_dict[str(int(prediction))]
         print('predict : ', prediction)
-
+        return prediction
 if __name__ == '__main__':
     pass

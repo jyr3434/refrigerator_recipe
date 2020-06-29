@@ -2,14 +2,12 @@
 <html lang="kr">
   <head>
     <meta charset="utf-8">
-
     {% if title %}
       <title>메인 페이지 - {{ title }}</title>
     {% else %}
       <title>메인 페이지</title>
     {% endif %}
   </head>
-
   <body>
   <script type="text/javascript">
     const browseBtn = document.querySelector('.browse-btn');
@@ -66,46 +64,78 @@
     </main>
     <form action = "http://localhost:5000/fileUpload" method = "POST" enctype = "multipart/form-data">
         <select class="browsers1" name="cate1" id="cate1"  >
-            <option value="cat1" >카테고리1</option>
-            <option value="크롬">크롬</option>
-            <option value="사파리">사파리</option>
-            <option value="엣지">엣지</option>
-            <option value="인터넷익스플로러" label="IE">인터넷익스플로러</option>
-            <option value="파이어폭스" >파이어폭스</option>
-            <option value="오페라">오페라</option>
+            <option >방법별</option>
+            <option value="볶음">볶음</option>
+            <option value="끓이기">끓이기</option>
+            <option value="부침">부침</option>
+            <option value="조림">조림</option>
+            <option value="무침" >무침</option>
+            <option value="찜">찜</option>
+            <option value="절임">절임</option>
+            <option value="튀김">튀김</option>
+            <option value="삶기">삶기</option>
+            <option value="굽기">굽기</option>
+            <option value="데치기">데치기</option>
+            <option value="회">회</option>
+            <option value="기타">기타</option>
         </select>
         <select class="#browsers1" name="cate2" id="cate2" >
-            <option value="cat2" >카테고리2</option>
-            <option value="크롬">크롬</option>
-            <option value="사파리">사파리</option>
-            <option value="엣지">엣지</option>
-            <option value="인터넷익스플로러" label="IE">인터넷익스플로러</option>
-            <option value="파이어폭스" >파이어폭스</option>
-            <option value="오페라">오페라</option>
+            <option >상황별</option>
+            <option value="일상">일상</option>
+            <option value="초스피드">초스피드</option>
+            <option value="손님접대">손님접대</option>
+            <option value="술안주">술안주</option>
+            <option value="다이어트" >다이어트</option>
+            <option value="도시락">도시락</option>
+            <option value="영양식">영양식</option>
+            <option value="간식">간식</option>
+            <option value="야식">야식</option>
+            <option value="푸드스타일링">푸드스타일링</option>
+            <option value="해장">해장</option>
+            <option value="명절">명절</option>
+            <option value="이유식">이유식</option>
+            <option value="기타">기타</option>
         </select>
         <select class="browsers1" name="cate3" id="cate3" >
-            <option value="cat3">카테고리3</option>
-            <option value="크롬">크롬</option>
-            <option value="사파리">사파리</option>
-            <option value="엣지">엣지</option>
-            <option value="인터넷익스플로러" label="IE">인터넷익스플로러</option>
-            <option value="파이어폭스" >파이어폭스</option>
-            <option value="오페라">오페라</option>
+            <option >재료별</option>
+            <option value="소고기">소고기</option>
+            <option value="돼지고기">돼지고기</option>
+            <option value="닭고기">닭고기</option>
+            <option value="육류">육류</option>
+            <option value="채소류" >채소류</option>
+            <option value="해물류">해물류</option>
+            <option value="달걀/유제품">달걀/유제품</option>
+            <option value="가공식품류">가공식품류</option>
+            <option value="쌀">쌀</option>
+            <option value="밀가루">밀가루</option>
+            <option value="건어물류">건어물류</option>
+            <option value="버섯류">버섯류</option>
+            <option value="과일류">과일류</option>
+            <option value="콩/견과류">콩/견과류</option>
+            <option value="곡류">곡류</option>
+            <option value="기타">기타</option>
         </select>
         <select class="browsers1" name="cate4" id="cate4" >
-            <option value="cat4" >카테고리4</option>
-            <option value="크롬">크롬</option>
-            <option value="사파리">사파리</option>
-            <option value="엣지">엣지</option>
-            <option value="인터넷익스플로러" label="IE">인터넷익스플로러</option>
-            <option value="파이어폭스" >파이어폭스</option>
-            <option value="오페라">오페라</option>
+            <option >종류별</option>
+            <option value="밑반찬">밑반찬</option>
+            <option value="메인반찬">메인반찬</option>
+            <option value="국/탕">국/탕</option>
+            <option value="찌개">찌개</option>
+            <option value="디저트">디저트</option>
+            <option value="면/만두">면/만두</option>
+            <option value="밥/죽/떡">밥/죽/떡</option>
+            <option value="퓨전">퓨전</option>
+            <option value="김치/젓갈/장류">김치/젓갈/장류</option>
+            <option value="양념/소스/잼">양념/소스/잼</option>
+            <option value="양식">양식</option>
+            <option value="샐러드">샐러드</option>
+            <option value="스프">스프</option>
+            <option value="빵">빵</option>
+            <option value="과자">차/음료/술</option>
+            <option value="기타">기타</option>
         </select>
         <input type = "file" name = "file" multiple/>
         <input type = "submit"/>
     </form>
-
-
-
   </body>
 </html>

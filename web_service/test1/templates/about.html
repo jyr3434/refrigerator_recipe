@@ -8,14 +8,18 @@
       <div id="imagePreview">
       <img id="img" />
           {% if label %}
-              {% for i in label %}
-                    <p>{{i}}</p>
-                    <img src="{{ url_for('static', filename='naver/'+i) }}"width="150" height="150" />
+              {% for i in range(lenghts) %}
+                    <p>{{label[i]}} : {{predict[i]}}</p>
+                    <img src="{{ url_for('static', filename='naver/'+label[i]) }}"width="150" height="150" />
               {% endfor %}
           {% else %}
               <h2>이미지가 안왔습니다.</h2>
           {% endif %}
-
+      </div>
+      <div>
+          {% for recipe in recommend_recipe %}
+            <a href="https://www.10000recipe.com/recipe/{{recipe[1]}}">{{recipe[2]}}</a><br>
+          {% endfor %}
       </div>
 <div class= "container">
        <h2>Results:</h2>
