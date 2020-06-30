@@ -1,68 +1,39 @@
 <!DOCTYPE HTML>
 <html lang="kr">
-  <head>
+<head>
     <meta charset="utf-8">
-    {% if title %}
-      <title>메인 페이지 - {{ title }}</title>
-    {% else %}
-      <title>메인 페이지</title>
-    {% endif %}
-  </head>
-  <body>
-  <script type="text/javascript">
-    const browseBtn = document.querySelector('.browse-btn');
-    const realInput = document.querySelector('#real-input');
-
-    browseBtn.addEventListener('click',()=>{
-        realInput.click();
-    });
-        function readInputFile(e){
-        var sel_files = [];
-
-        sel_files = [];
-        $('#imagePreview').empty();
-
-        var files = e.target.files;
-        var fileArr = Array.prototype.slice.call(files);
-        var index = 0;
-
-        fileArr.forEach(function(f){
-            if(!f.type.match("image/.*")){
-                alert("이미지 확장자만 업로드 가능합니다.");
-                return;
-            };
-            if(files.length < 11){
-                sel_files.push(f);
-                var reader = new FileReader();
-                reader.onload = function(e){
-                    var html = `<a id=img_id_${index}><img src=${e.target.result} data-file=${f.name} /></a>`;
-                    $('imagePreview').append(html);
-                    index++;
-                };
-                reader.readAsDataURL(f);
-            }
-        }
-        if(files.length > 11){
-            alert("최대 10장까지 업로드 할 수 있습니다.");
-        }
-    }
-
-    $('#real-input').on('change',readInputFile);
-</script>
-    <header>
-      <nav>
+        {% if title %}
+            <title>메인 페이지 - {{ title }}</title>
+        {% else %}
+            <title>메인 페이지</title>
+        {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='loding_c.css') }}">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type=text/javascript>
+        $(document).ready(function(){
+            $("#hbtn").click(function(){
+                $("#content").hide();
+                $("#loading").show();
+            });
+        });
+    </script>
+</head>
+<body>
+<header>
+    <nav>
         <a href="/">Flask 블로그</a>
         <a href="/">Home</a>
         <a href="/about">About</a>
-      </nav>
-      <hr>
-    </header>
+    </nav>
+    <hr>
+</header>
 
-    <main role="main">
-    <!-- Main content block -->
-    {% block content %}{% endblock %}
-    </main>
-    <form action = "http://localhost:5000/fileUpload" method = "POST" enctype = "multipart/form-data">
+<main role="main">
+<!-- Main content block -->
+{% block content %}{% endblock %}
+</main>
+<div id="content">
+    <form action = "http:///192.168.0.26:5000/fileUpload" method = "POST" enctype = "multipart/form-data">
         <select class="browsers1" name="cate1" id="cate1"  >
             <option >방법별</option>
             <option value="볶음">볶음</option>
@@ -135,7 +106,10 @@
             <option value="기타">기타</option>
         </select>
         <input type = "file" name = "file" multiple/>
-        <input type = "submit"/>
+        <input id="hbtn" type="submit" name="anything_submit" value="Submit" onclick="loading();">
     </form>
-  </body>
+</div>
+<div id="loading" class="loader" hidden></div>
+
+</body>
 </html>
