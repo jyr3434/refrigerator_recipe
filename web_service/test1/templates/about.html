@@ -1,45 +1,41 @@
-
-<div>
-  <h1>About</h1>
-
-</div>
-      <h3>{{result}}</h3>
-      <h3>이미지 미리보기</h3>
-      <div id="imagePreview">
-      <img id="img" />
-          {% if label %}
-              {% for i in range(lenghts) %}
-                    <p>{{label[i]}} : {{predict[i]}}</p>
-                    <img src="{{ url_for('static', filename='naver/'+label[i]) }}"width="150" height="150" />
-              {% endfor %}
-          {% else %}
-              <h2>이미지가 안왔습니다.</h2>
-          {% endif %}
-      </div>
-      <div>
-          {% for recipe in recommend_recipe %}
-            <a href="https://www.10000recipe.com/recipe/{{recipe[1]}}">{{recipe[2]}}</a><br>
+<style>
+    table,th,td,tr{
+    border: 1px solid black;
+    }
+    div{
+    text-align: center;
+    table-align: center;
+    img-align: center;
+    }
+</style>
+<div style="background-color: lightblue">
+    <h1 align="center">추천 결과</h1>
+    <h3 align="center"><a href="http://192.168.0.26:6006/#graphs" target="_blank">Image_Classification_Model_Structure</a></h3>
+</div >
+    <div id="imagePreview" style="background-color: lightgreen">
+        <h3 align="center">이미지 분류 결과</h3>
+        <img id="img" />
+      {% if label %}
+          {% for i in range(lenghts) %}
+                <p>{{label[i]}} : {{predict[i]}}</p>
+                <img src="{{ url_for('static', filename='naver/'+label[i]) }}"width="150" height="150" />
           {% endfor %}
-      </div>
-<div class= "container">
-       <h2>Results:</h2>
-       <table class="table table-striped">
-       <thead>
-       <tr>
-           <th>result</th>
-<!--           <th>Name</th>-->
-<!--           <th>Prices</th>-->
-<!--           <th>Sizes</th>-->
-<!--           <th>Shoe Type</th>-->
-       </tr>
-       </thead>
-           <tbody>
-       {% if label %}
-       <tr>
-           <td>{{ result }}</td> <h1>조건은 성립</h1>
-       </tr>
-       {% else %}
-       <h1>드롭박스 값 오지못함</h1>
-       {% endif %}
-       </table>
-</div>
+      {% else %}
+          <h2>이미지가 안왔습니다.</h2>
+      {% endif %}
+    </div>
+    <div>
+    <img src="/plot.png" alt="my plot" >
+    </div>
+    <div style="background-color: lightblue">
+      <table align="center" style="background-color: white">
+          <th>추천 레시피</th>
+          {% for recipe in recommend_recipe_set %}
+            <tr>
+                <td>
+                    <a href="https://www.10000recipe.com/recipe/{{recipe[1]}}" target="_blank">{{recipe[2]}}</a>
+                </td>
+            </tr>
+          {% endfor %}
+      </table>
+    </div>
