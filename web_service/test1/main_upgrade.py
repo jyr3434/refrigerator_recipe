@@ -17,6 +17,7 @@ from flask import Response
 import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
+from refrigerator_recipe.computer_vision.cv_model import ResNet
 
 class Datas:
     def __init__(self):
@@ -26,6 +27,17 @@ class Datas:
 datas = Datas()
 app = Flask(__name__)
 app_root = os.path.abspath(os.path.dirname(__file__))
+
+
+def load_model():
+    # 미리 학습된 Keras 모델을 불러옵니다(여기서 우리는 ImageNet으로 학습되고
+    # Keras에서 제공하는 모델을 사용합니다. 하지만 쉽게 하기위해
+    # 당신이 설계한 신경망으로 대체할 수 있습니다.)
+    global prediction
+    model_path = '../data/computer_vision_data/resnet_extraction_224__epoch40_85.h5'
+    label_path = '../data/computer_vision_data/label_dict.txt'
+    prediction = Prediction(model_path, label_path)
+
 
 @app.route('/')
 @app.route('/index')
@@ -40,13 +52,25 @@ def about():
 @app.route('/fileUpload', methods = ['GET', 'POST'])
 # 이미지 파일 업로드 및 출력 시도
 def upload_file():
-    global datas
-    if request.method == 'POST':
 
-        cat1 = request.form['cate1']
-        cat2 = request.form['cate2']
-        cat3 = request.form['cate3']
-        cat4 = request.form['cate4']
+    # def predict_label(img_array):
+    #     global labeling_dict
+    #     global model
+    #     prediction = model.predict(img_array)
+    #     # one_hot_encoding convert to integer
+    #     prediction = np.argmax(prediction[0])
+    #     prediction = labeling_dict[str(int(prediction))]
+    #     print('predict : ', prediction)
+    #     return prediction
+
+    global datas
+
+    if request.method == 'POST':
+        start = time.time()
+
+
+
+
         #저장할 경로 + 파일명
         print(app_root)
         # return 'uploads 디렉토리 -> 파일 업로드 성공!'
@@ -58,9 +82,7 @@ def upload_file():
         ############# 이미지 판별 #############
         # '../../data/computer_vision_data/resnet_extraction_224__epoch40_85.h5'
         # '../../data/computer_vision_data/label_dict.txt'
-        model_path = '../../../data/computer_vision_data/resnet_extraction_224__epoch40_85.h5'
-        label_path = '../../../data/computer_vision_data/label_dict.txt'
-        prediction = Prediction(model_path, label_path)
+
         # load image and convert to array( input shape)
         sources_set = set()
         sources_predict = []
@@ -71,66 +93,55 @@ def upload_file():
             img_array = img_array.reshape(1, 224, 224, 3)
             predict_label = prediction.predict_label(img_array)
 
-            sources_set.add(predict_label) # 레시피 찾는데 사용할것
-            sources_predict.append(predict_label) # html에 출력하는데 사용할것
+            sources_set.add(predict_label)  # 레시피 찾는데 사용할것
+            sources_predict.append(predict_label)  # html에 출력하는데 사용할것
 
         ############# 판별 이미지로 레시피 검색 #############
-        # '../../data/nlp_data/source_embedding.csv'
-        # '../../data/nlp_data/recipe_embedding.csv'
-        source_path = '../../../data/nlp_data/source_embedding.csv'
-        recipe_path = '../../../data/nlp_data/recipe_embedding.csv'
-        sourceFrame = pd.read_csv(source_path, index_col=3)
-        recipeFrame = pd.read_csv(recipe_path)
-        print(sourceFrame.shape, '\n', recipeFrame.shape)
 
         sources = list(sources_set)
-        select_cat = (cat1, cat2, cat3, cat4)
-        select_cat = [i for i in select_cat if i not in ('방법별','상황별','재료별','종류별')]
-        # 각 재료별 좌표를 저장하는 객체
-        sources_point_dict = {source: (sourceFrame.loc[source, 'x'],
-                                       sourceFrame.loc[source, 'y'],
-                                       sourceFrame.loc[source, 'z']) for source in sources}
-        print(sources_point_dict.keys())
-        # 레시피와 각 재료별 거리를 저장하는 객체
-        sources_distance_dict = {source: [] for source in sources}
-
-        select_cat_set = set(select_cat)
-        sources_set = set(sources)
-        select_length = len(select_cat_set)
 
         ################################# 레시피 찾기 ########################
-        start_time = time.time()
-        for idx, row in recipeFrame.iterrows():
-            recipe_category = set([row.cat1, row.cat2, row.cat3, row.cat4])
-            # 카테고리에 해당되는지
-            if len(recipe_category.intersection(select_cat_set)) == select_length:
-                # 재료 포함하고 있는지
-                recipe_sources = set(row.kwd_source.split('|'))
-                if recipe_sources.intersection(sources_set):
-                    recipe_point = (row.x, row.y, row.z)
-                    # 재료별 거리 리스트 만들기 ( 거리, 아이디, 제목, 좌표 )
-                    for source in sources:
-                        distance = calculate_distance(sources_point_dict[source], recipe_point)
-                        sources_distance_dict[source].append((distance, row.id, row.title, recipe_point))
-        times = time.time() - start_time
-        print(times)
+        flask_path = '../data/nlp_data/recommend_data.csv'
+        FlaskFrame = pd.read_csv(flask_path, index_col=(1, 2, 3, 4))
 
-        recommend_recipe_set = set()
-        for distance_list in sources_distance_dict.values():
-            recommend_recipe_set.update(sorted(distance_list, key=lambda x: x[0])[:10])
-        [print(i) for i in recommend_recipe_set]
 
-        datas.recommend_recipe_set = recommend_recipe_set
-        datas.sources_point_dict = sources_point_dict
-        return render_template('about.html',
+        request_cate = [(request.form['cate1']),(request.form['cate2']),(request.form['cate3']),(request.form['cate4'])]
+        cate = [slice(None),slice(None),slice(None),slice(None)]
+        for idx in range(4):
+            if request_cate[idx] not in ('방법별','상황별','재료별','종류별'):
+                cate[idx] = request_cate[idx]
+
+        columns = ['id','title']
+        columns.extend(sources)
+
+        print(cate)
+        print(columns)
+
+        print(FlaskFrame.loc[cate,columns])
+        frame_None = FlaskFrame.loc[cate, columns]
+
+        print(list(frame_None.columns))
+        print(frame_None.sort_values(by=list(frame_None.columns)[2:]))
+
+        final_recipe_dict = dict()
+
+        for source in list(frame_None.columns)[2:]:
+            source_frame = frame_None.loc[:, ('id', 'title', source)].dropna().sort_values(by=(source))[0:5]
+            final_recipe_dict.update({d[0]: d[1] for d in zip(source_frame.id, source_frame.title)})
+
+        print(final_recipe_dict)
+
+        print(time.time() - start)
+
+        return render_template('test_output.html',
                               label=filenames,
-                              recommend_recipe_set=recommend_recipe_set,
+                              recommend_recipe_dict=final_recipe_dict,
                               predict=sources_predict,
                               lenghts = len(filenames))
 
-@app.route('/loding')
-def loding():
-    return render_template('loding.html', title='loding')
+# @app.route('/loding')
+# def loding():
+#     return render_template('loding.html', title='loding')
 
 @app.route('/plot.png')
 def plot_png():
@@ -172,4 +183,15 @@ def create_figure(recommend_recipe_set,sources_point_dict):
 
 if __name__ == '__main__':
     #서버 실행
-    app.run( host="112.186.93.164",debug = True)
+    # http://112.186.93.164:5000/
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            tf.config.experimental.set_memory_growth(gpus[0], True)
+        except RuntimeError as e:
+            # 프로그램 시작시에 메모리 증가가 설정되어야만 합니다
+            print(e)
+    load_model()
+
+    app.run(host='112.186.93.164',port='5000',debug = True)
+    # http://192.168.0.3:5000/

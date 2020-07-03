@@ -67,6 +67,7 @@ if __name__ == '__main__':
     ############# 판별 이미지로 레시피 검색 #############
     source_path = '../../data/nlp_data/source_embedding.csv'
     recipe_path = '../../data/nlp_data/recipe_embedding.csv'
+    flask_path = '../../data/nlp_data/recommend_data.csv'
     sourceFrame = pd.read_csv(source_path,index_col=3)
     recipeFrame = pd.read_csv(recipe_path)
     print(sourceFrame.shape,'\n',recipeFrame.shape)
