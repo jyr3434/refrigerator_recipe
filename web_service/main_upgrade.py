@@ -27,17 +27,23 @@ class Datas:
 datas = Datas()
 app = Flask(__name__)
 app_root = os.path.abspath(os.path.dirname(__file__))
+prediction = None
 
+FlaskFrame = None
 
 def load_model():
     # 미리 학습된 Keras 모델을 불러옵니다(여기서 우리는 ImageNet으로 학습되고
     # Keras에서 제공하는 모델을 사용합니다. 하지만 쉽게 하기위해
     # 당신이 설계한 신경망으로 대체할 수 있습니다.)
     global prediction
-    model_path = '../data/computer_vision_data/resnet_extraction_224__epoch40_85.h5'
-    label_path = '../data/computer_vision_data/label_dict.txt'
+    model_path = '../../data/computer_vision_data/resnet_extraction_224__epoch40_85.h5'
+    label_path = '../../data/computer_vision_data/label_dict.txt'
     prediction = Prediction(model_path, label_path)
 
+def load_frame():
+    global FlaskFrame
+    flask_path = '../../data/nlp_data/recommend_data.csv'
+    FlaskFrame = pd.read_csv(flask_path, index_col=(1, 2, 3, 4))
 
 @app.route('/')
 @app.route('/index')
@@ -64,12 +70,10 @@ def upload_file():
     #     return prediction
 
     global datas
+    global FlaskFrame
+    global prediction
 
     if request.method == 'POST':
-        start = time.time()
-
-
-
 
         #저장할 경로 + 파일명
         print(app_root)
@@ -100,9 +104,9 @@ def upload_file():
 
         sources = list(sources_set)
 
-        ################################# 레시피 찾기 ########################
-        flask_path = '../data/nlp_data/recommend_data.csv'
-        FlaskFrame = pd.read_csv(flask_path, index_col=(1, 2, 3, 4))
+        # ################################# 레시피 찾기 ########################
+        # flask_path = '../../data/nlp_data/recommend_data.csv'
+        # FlaskFrame = pd.read_csv(flask_path, index_col=(1, 2, 3, 4))
 
 
         request_cate = [(request.form['cate1']),(request.form['cate2']),(request.form['cate3']),(request.form['cate4'])]
@@ -117,18 +121,19 @@ def upload_file():
         print(cate)
         print(columns)
 
-        print(FlaskFrame.loc[cate,columns])
+        # print(FlaskFrame.loc[cate,columns])
         frame_None = FlaskFrame.loc[cate, columns]
 
-        print(list(frame_None.columns))
-        print(frame_None.sort_values(by=list(frame_None.columns)[2:]))
+        # print(list(frame_None.columns))
+        # print(frame_None.sort_values(by=list(frame_None.columns)[2:]))
 
         final_recipe_dict = dict()
 
         for source in list(frame_None.columns)[2:]:
+            start = time.time()
             source_frame = frame_None.loc[:, ('id', 'title', source)].dropna().sort_values(by=(source))[0:5]
             final_recipe_dict.update({d[0]: d[1] for d in zip(source_frame.id, source_frame.title)})
-
+            print(time.time() - start)
         print(final_recipe_dict)
 
         print(time.time() - start)
@@ -192,6 +197,6 @@ if __name__ == '__main__':
             # 프로그램 시작시에 메모리 증가가 설정되어야만 합니다
             print(e)
     load_model()
-
-    app.run(host='112.186.93.164',port='5000',debug = True)
+    load_frame()
+    app.run(host='118.34.233.33',port='5000',debug = True)
     # http://192.168.0.3:5000/

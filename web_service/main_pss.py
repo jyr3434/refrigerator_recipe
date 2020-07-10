@@ -58,8 +58,8 @@ def upload_file():
         ############# 이미지 판별 #############
         # '../../data/computer_vision_data/resnet_extraction_224__epoch40_85.h5'
         # '../../data/computer_vision_data/label_dict.txt'
-        model_path = '../../../data/computer_vision_data/resnet_extraction_224__epoch40_85.h5'
-        label_path = '../../../data/computer_vision_data/label_dict.txt'
+        model_path = '../../data/computer_vision_data/resnet_extraction_224__epoch40_85.h5'
+        label_path = '../../data/computer_vision_data/label_dict.txt'
         prediction = Prediction(model_path, label_path)
         # load image and convert to array( input shape)
         sources_set = set()
@@ -77,8 +77,8 @@ def upload_file():
         ############# 판별 이미지로 레시피 검색 #############
         # '../../data/nlp_data/source_embedding.csv'
         # '../../data/nlp_data/recipe_embedding.csv'
-        source_path = '../../../data/nlp_data/source_embedding.csv'
-        recipe_path = '../../../data/nlp_data/recipe_embedding.csv'
+        source_path = '../../data/nlp_data/source_embedding.csv'
+        recipe_path = '../../data/nlp_data/recipe_embedding.csv'
         sourceFrame = pd.read_csv(source_path, index_col=3)
         recipeFrame = pd.read_csv(recipe_path)
         print(sourceFrame.shape, '\n', recipeFrame.shape)
