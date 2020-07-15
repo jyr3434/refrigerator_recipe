@@ -28,7 +28,6 @@ datas = Datas()
 app = Flask(__name__)
 app_root = os.path.abspath(os.path.dirname(__file__))
 prediction = None
-
 FlaskFrame = None
 
 def load_model():
